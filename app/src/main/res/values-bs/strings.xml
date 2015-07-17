@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Forecastly</string>
     <string name="rain">Moguća kiša</string>
-    <string name="and_it_will">"I tu će biti "</string>
+    <string name="and_it_will">"Neće biti "</string>
     <string name="degrees_Text">" stepeni."</string>
     <string name="error_message">Došlo je do greške. Molimo pokušajte ponovo.</string>
     <string name="error_title">Ups! Žao mi je!</string>
@@ -20,11 +20,11 @@
     <string name="seven_days">7 Dani</string>
     <string name="sleet">Moguća susnježica</string>
     <string name="snow">Mogući snijeg</string>
-    <string name="the_temp_will_text">" temperatura će biti "</string>
+    <string name="the_temp_will_text">"Temperatura će biti "</string>
     <string name="the_weather_was_label">temperature na izabrani dan.</string>
     <string name="time_text">"U "</string>
     <string name="week">Sedmica</string>
     <string name="weeks_weather_label">Vrijeme za tjedan</string>
-    <string name="will_the_temp">" Će najviša temperatura biti "</string>
+    <string name="will_the_temp">"Najveća temperatura će biti "</string>
     <string name="today">Danas</string>
 </resources>

@@ -17,14 +17,14 @@
     <string name="hour_by_hour">Timme för timme</string>
     <string name="on_text">"På "</string>
     <string name="degrees_Text">" grader."</string>
-    <string name="and_it_will">"Och det kommer vara "</string>
+    <string name="and_it_will">"Det kommer vara "</string>
     <string name="time_text">"Klockan "</string>
-    <string name="will_the_temp">" kommer högsta temperaturen ligga på "</string>
+    <string name="will_the_temp">"Högsta temperaturen kommer ligga på "</string>
     <string name="hail">Risk för hagel</string>
     <string name="rain">Risk för regn</string>
     <string name="week">Vecka</string>
     <string name="sleet">Risk för snöblandat regn</string>
     <string name="snow">Risk för snöfall</string>
-    <string name="the_temp_will_text">" temperaturen kommer att vara "</string>
+    <string name="the_temp_will_text">"Temperaturen kommer att vara "</string>
     <string name="today">Idag</string>
 </resources>

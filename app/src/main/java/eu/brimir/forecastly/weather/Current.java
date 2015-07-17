@@ -1,13 +1,9 @@
 package eu.brimir.forecastly.weather;
 
-import android.content.Context;
-
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import eu.brimir.forecastly.R;
 
 /**
  * Created by Patrik on 2015-07-09.
@@ -21,7 +17,8 @@ public class Current {
     private String mPrecipType;
     private String mSummary;
     private String mTimeZone;
-    private Context mContext;
+    private String locale = Locale.getDefault().getLanguage().toString();
+
     public String getTimeZone() {
         return mTimeZone;
     }
@@ -40,7 +37,7 @@ public class Current {
 
     public int getIconId() {
         //clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
-      return Forecast.getIconId(mIcon);
+        return Forecast.getIconId(mIcon);
     }
 
     private long getTime() {
@@ -57,12 +54,11 @@ public class Current {
         String timeString = formatter.format(dateTime);
         String dayString = formatterDay.format(dateTime);
         String weekString = formatterWeek.format(dateTime);
-        String locale = Locale.getDefault().getLanguage().toString();
-        if (locale.equals("sv")){
-            return timeString + ", "+dayString + ". " + " Vecka " + " " + weekString ;
-        }else{
 
-        }return timeString + ", "+dayString;
+        if (locale.equals("sv")) {
+            return timeString + ", " + dayString + ". " + " Vecka " + " " + weekString;
+        }
+        return timeString + ", " + dayString;
 
     }
 
@@ -107,17 +103,102 @@ public class Current {
 
     public String getPrecipType() {
 
-        switch (mPrecipType) {
-            case "rain":
+        if (locale.equals("sv")) {
+            switch (mPrecipType) {
+                case "rain":
 
-                return mContext.getString(R.string.rain);
-            case "snow":
-                return mContext.getString(R.string.snow);
-            case "sleet":
-                return mContext.getString(R.string.sleet);
-            case "hail":
-                return mContext.getString(R.string.hail);
+                    return "Risk för regn";
+                case "snow":
+                    return "Risk för snöfall";
+                case "sleet":
+                    return "Risk för snöblandat regn";
+                case "hail":
+                    return "Risk för hagel";
+            }
+        } else if (locale.equals("ar")) {
+            switch (mPrecipType) {
+                case "rain":
+
+                    return "فرصة للمطر";
+                case "snow":
+                    return "فرصة للثلج";
+                case "sleet":
+                    return "فرصة من الصقيع";
+                case "hail":
+                    return "فرصة من البرد";
+            }
+
+        }else if (locale.equals("bs")) {
+            switch (mPrecipType) {
+                case "rain":
+
+                    return "Moguća kiša";
+                case "snow":
+                    return "Mogući snijeg";
+                case "sleet":
+                    return "Moguća susnježica";
+                case "hail":
+                    return "Moguća grad";
+            }
+        }else if (locale.equals("de")) {
+            switch (mPrecipType) {
+                case "rain":
+                    return "Vereinzelt regen";
+
+                case "snow":
+                    return "Vereinzelt Schnee";
+
+                case "sleet":
+                    return "Vereinzelt Schneeregen";
+
+                case "hail":
+                    return "Vereinzelt Hagel";
+            }
+        }else if (locale.equals("en")) {
+            switch (mPrecipType) {
+                case "rain":
+                    return "Chance of rain";
+
+                case "snow":
+                    return "Chance of snow";
+
+                case "sleet":
+                    return "Chance of sleet";
+
+                case "hail":
+                    return "Chance of hail";
+            }
+        }else if (locale.equals("es")) {
+            switch (mPrecipType) {
+                case "rain":
+                    return "Probabilidad de lluvia";
+
+                case "snow":
+                    return "Probabilidad de lluvia";
+
+                case "sleet":
+                    return "Posibilidad de aguanieve";
+
+                case "hail":
+                    return "Probabilidad de lluvia";
+            }
         }
+        else if (locale.equals("fr")) {
+            switch (mPrecipType) {
+                case "rain":
+                    return "Risque de pluie";
+
+                case "snow":
+                    return "Risque de neige";
+
+                case "sleet":
+                    return "Risque de verglas";
+
+                case "hail":
+                    return "Risque de grêle";
+            }
+        }
+
         return mPrecipType;
     }
 
@@ -126,7 +207,6 @@ public class Current {
     }
 
     public String getSummary() {
-
 
 
         return mSummary;

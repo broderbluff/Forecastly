@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Forecastly</string>
-    <string name="will_the_temp">" sera la plus haute température être "</string>
+    <string name="will_the_temp">"La température la plus élevée sera "</string>
     <string name="weeks_weather_label">Météo pour la semaine</string>
     <string name="week">Semaine</string>
     <string name="time_text">"À "</string>
     <string name="the_weather_was_label">la temperatura en el día seleccionado.</string>
-    <string name="the_temp_will_text">" la température sera "</string>
+    <string name="the_temp_will_text">"La température sera "</string>
     <string name="snow">Risque de neige</string>
     <string name="sleet">Risque de verglas</string>
     <string name="seven_days">7 Jours</string>
@@ -25,6 +25,6 @@
     <string name="error_title">Oups! Désolé!</string>
     <string name="error_message">"Il y avait une erreur. S'il vous plaît essayer à nouveau."</string>
     <string name="degrees_Text">" degrés."</string>
-    <string name="and_it_will">"Et il y aura "</string>
+    <string name="and_it_will">"Il y aura "</string>
     <string name="today">"Aujourd'hui"</string>
 </resources>

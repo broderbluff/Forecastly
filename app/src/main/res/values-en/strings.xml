@@ -16,12 +16,12 @@
 
     <string name="weeks_weather_label">Weather for the week</string>
     <string name="hour_by_hour">Hourly</string>
-    <string name="and_it_will">"And there will be "</string>
+    <string name="and_it_will">"There will be "</string>
     <string name="degrees_Text">" degrees."</string>
     <string name="on_text">"On "</string>
-    <string name="the_temp_will_text">" the temperature will be "</string>
+    <string name="the_temp_will_text">"The temperature will be "</string>
     <string name="time_text">"At "</string>
-    <string name="will_the_temp">" will the highest temperature be "</string>
+    <string name="will_the_temp">"The highest temperature will be "</string>
     <string name="hail">Chance of hail</string>
     <string name="rain">Chance of rain</string>
     <string name="week">Week</string>

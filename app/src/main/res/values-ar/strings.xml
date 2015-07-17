@@ -15,12 +15,12 @@
     <string name="the_weather_was_label">درجة الحرارة في اليوم المحدد.</string>
     <string name="weeks_weather_label">الطقس لهذا الأسبوع</string>
     <string name="hour_by_hour">باستمرار</string>
-    <string name="the_temp_will_text">"درجة الحرارة ستكون "</string>
+    <string name="the_temp_will_text">"درجة الحرارة ستكون"</string>
     <string name="degrees_Text">"درجة ".</string>
     <string name="on_text">"على "</string>
-    <string name="and_it_will">واضاف "سيكون هناك"</string>
+    <string name="and_it_will">"سيكون هناك "</string>
     <string name="time_text">"في"</string>
-    <string name="will_the_temp">"سوف تكون أعلى درجة حرارة"</string>
+    <string name="will_the_temp">" أعلى درجة حرارة ستكون"</string>
     <string name="hail">فرصة من البرد</string>
     <string name="sleet">فرصة من الصقيع</string>
     <string name="snow">فرصة للثلج</string>

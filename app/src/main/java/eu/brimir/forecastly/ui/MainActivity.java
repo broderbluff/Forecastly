@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static final int DIALOG_ID = 0;
     private long mTimeMachineValue;
     private String forecastUrl;
+    private String locale = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
@@ -369,15 +370,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (latitude == 0.0 && longitude == 0.0) {
             mTemperatureLabel.setText("--");
         }
-        if (current.getTemperature() >= 25) {
-            YoYo.with(Techniques.Tada)
-                    .duration(700)
-                    .playOn(findViewById(R.id.temperatureLabel));
-        } else if (current.getTemperature() <= 0) {
-            YoYo.with(Techniques.Shake)
-                    .duration(500)
-                    .playOn(findViewById(R.id.temperatureLabel));
+
+
+
+        if(locale.equals("en_US")){
+            if (current.getTemperature() >= 77) {
+                YoYo.with(Techniques.Tada)
+                        .duration(700)
+                        .playOn(findViewById(R.id.temperatureLabel));
+            } else if (current.getTemperature() <= 32) {
+                YoYo.with(Techniques.Shake)
+                        .duration(500)
+                        .playOn(findViewById(R.id.temperatureLabel));
+            }
+        }else{
+            if (current.getTemperature() >= 25) {
+                YoYo.with(Techniques.Tada)
+                        .duration(700)
+                        .playOn(findViewById(R.id.temperatureLabel));
+            } else if (current.getTemperature() <= 0) {
+                YoYo.with(Techniques.Shake)
+                        .duration(500)
+                        .playOn(findViewById(R.id.temperatureLabel));
+            }
         }
+
+
 
     }
 

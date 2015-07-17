@@ -1,13 +1,17 @@
 package eu.brimir.forecastly.ui;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -53,13 +57,42 @@ public class DailyForecastActivity extends ListActivity {
         String dayOfTheWeek = mDays[position].getDayOfTheWeek();
         String conditions = mDays[position].getSummary();
         String highTemp = mDays[position].getTemperatureMax() + "";
+        int iconId = mDays[position].getIconId();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater=DailyForecastActivity.this.getLayoutInflater();
+        @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+
+        builder.setView(layout);
 
 
-        String message = String.format(getString(R.string.on_text)+ dayOfTheWeek + getString(R.string.will_the_temp) + highTemp +getString(R.string.degrees_Text)+ "\n"  +"\n" +getString(R.string.and_it_will)+ conditions);
+        TextView title = (TextView)layout.findViewById(R.id.pickedDayTextView);
+        TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
+        ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
+        Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+        title.setText(dayOfTheWeek);
+        message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will) + conditions);
+        icon.setImageResource(iconId);
+        final AlertDialog dialog = builder.create();
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               dialog.dismiss();
+            }
+        });
+
+
+
+
+        dialog.show();
+
+
+
+      /*  String message = String.format(getString(R.string.on_text)+ dayOfTheWeek + getString(R.string.will_the_temp) + highTemp +getString(R.string.degrees_Text)+ "\n"  +"\n" +getString(R.string.and_it_will)+ conditions);
         for (int i=0; i < 2; i++)
         {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        }
+        }*/
 
 
 
