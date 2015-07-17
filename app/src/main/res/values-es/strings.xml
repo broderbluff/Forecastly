@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forecastly</string>
+    <string name="and_it_will">"Y habrá "</string>
+    <string name="degrees_Text">" grados."</string>
+    <string name="error_message">Hubo un error. Por favor, vuelva a intentarlo.</string>
+    <string name="error_title">¡Huy! Apenado!</string>
+    <string name="forecastio">Desarrollado por Forecast</string>
+    <string name="getting_weather_data">Obtener los datos del tiempo ....</string>
+    <string name="hail">Probabilidad de lluvia</string>
+    <string name="hour_by_hour">Cada hora</string>
+    <string name="hour_label">cada hora</string>
+    <string name="humidity">Humedad</string>
+    <string name="no_daily_forecast_data">No hay datos meteorológicos disponibles</string>
+    <string name="no_network_toast">Red no está disponible!</string>
+    <string name="ok_button">OK</string>
+    <string name="on_text">"En "</string>
+    <string name="precip_label">Precipitación?</string>
+    <string name="rain">Probabilidad de lluvia</string>
+    <string name="seven_days">7 Días</string>
+    <string name="sleet">Posibilidad de aguanieve</string>
+    <string name="snow">Probabilidad de lluvia</string>
+    <string name="the_temp_will_text">" la temperatura será "</string>
+    <string name="the_weather_was_label">la temperatura en el día seleccionado.</string>
+    <string name="time_text">"A "</string>
+    <string name="week">Semana</string>
+    <string name="weeks_weather_label">El tiempo para la semana</string>
+    <string name="will_the_temp">" será la temperatura más alta será "</string>
+    <string name="today">Hoy</string>
+</resources>

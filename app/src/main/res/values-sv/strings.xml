@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forecastly</string>
+    <string name="error_message">Ett fel har uppstått, försök igen.</string>
+    <string name="error_title">Oops! Ursäkta!</string>
+    <string name="forecastio">Väderdata av Forecast</string>
+    <string name="getting_weather_data">Hämtar väderdata....</string>
+    <string name="hour_label">Timprognos</string>
+    <string name="humidity">Luftfuktighet</string>
+    <string name="no_daily_forecast_data">Ingen tillgänglig väderdata</string>
+    <string name="no_network_toast">Nätverk otillgängligt</string>
+    <string name="ok_button">OK</string>
+    <string name="precip_label">Nederbörd?</string>
+    <string name="seven_days">7 Dagar</string>
+    <string name="the_weather_was_label">temperaturen på den valda dagen.</string>
+    <string name="weeks_weather_label">Veckans väder</string>
+    <string name="hour_by_hour">Timme för timme</string>
+    <string name="on_text">"På "</string>
+    <string name="degrees_Text">" grader."</string>
+    <string name="and_it_will">"Och det kommer vara "</string>
+    <string name="time_text">"Klockan "</string>
+    <string name="will_the_temp">" kommer högsta temperaturen ligga på "</string>
+    <string name="hail">Risk för hagel</string>
+    <string name="rain">Risk för regn</string>
+    <string name="week">Vecka</string>
+    <string name="sleet">Risk för snöblandat regn</string>
+    <string name="snow">Risk för snöfall</string>
+    <string name="the_temp_will_text">" temperaturen kommer att vara "</string>
+    <string name="today">Idag</string>
+</resources>
