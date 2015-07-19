@@ -51,9 +51,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.brimir.forecastly.ui.MainActivity" />
         </activity>
-
-
-
     </application>
 
 </manifest>

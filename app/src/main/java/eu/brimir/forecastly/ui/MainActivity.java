@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -61,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private LocationManager locationManager;
     private double latitude;
     private double longitude;
+    private String getLocality;
+   private String getAdminArea;
+
     private String locationForDaily;
     private int year_x;
     private int month_x;
@@ -112,12 +116,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        final Calendar cal = Calendar.getInstance();
-        year_x = cal.get(Calendar.YEAR);
-        month_x = cal.get(Calendar.MONTH);
-        day_x = cal.get(Calendar.DAY_OF_MONTH);
 
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -125,7 +125,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         getLocation();
         getForecast(latitude, longitude);
         getAddress(latitude, longitude);
-
+        final Calendar cal = Calendar.getInstance();
+        year_x = cal.get(Calendar.YEAR);
+        month_x = cal.get(Calendar.MONTH);
+        day_x = cal.get(Calendar.DAY_OF_MONTH);
 
         mTimeMachine.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             year_x = year;
-            month_x = monthOfYear + 1;
+            month_x = monthOfYear;
             day_x = dayOfMonth;
             componentTimeToTimestamp(year_x, month_x, day_x);
 
@@ -183,29 +186,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     };
 
     private void getAddress(double latitude, double longitude) {
-        Geocoder gcd = new Geocoder(MainActivity.this, Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = gcd.getFromLocation(latitude,
-                    longitude, 1);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
-        if (addresses != null && addresses.size() > 0) {
-
-            mLocationLabel.setText(addresses.get(0).getLocality());
-
-            locationForDaily = (addresses.get(0).getLocality());
-            if (addresses.get(0).getLocality() == null) {
-
-                mLocationLabel.setText(addresses.get(0).getAdminArea());
-                locationForDaily = (addresses.get(0).getLocality());
+        GetAddressAsynctask addressAsynctask = new GetAddressAsynctask();
+       addressAsynctask.execute(latitude, longitude);
 
 
-            }
-        }
+
+
     }
 
     private void componentTimeToTimestamp(int year, int month, int day) {
@@ -225,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getForecast(double latitude, double longitude) {
         String apiKey = "6d73ebc175b9afd40c6e48e5700ca316";
 
-        String locale = Locale.getDefault().getLanguage().toString();
+
         String locale2 = Locale.getDefault().toString();
         if (locale.equals("sv")){
 
@@ -298,7 +285,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     .build();
 
             Call call = client.newCall(request);
+
             call.enqueue(new Callback() {
+
                 @Override
                 public void onFailure(Request request, IOException e) {
                     runOnUiThread(new Runnable() {
@@ -327,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 @Override
                                 public void run() {
                                     updateDisplay();
+
                                 }
                             });
 
@@ -591,6 +581,53 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
+private class GetAddressAsynctask extends AsyncTask<Object, Void, Void >{
 
+    @Override
+    protected Void doInBackground(Object... location) {
+
+        double latitude = (Double) location[0];
+        double longiitude = (Double) location[1];
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = gcd.getFromLocation(latitude,
+                    longitude, 1);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        if (addresses != null && addresses.size() > 0) {
+
+
+
+            getLocality = (addresses.get(0).getLocality());
+
+            getAdminArea = (addresses.get(0).getLocality());
+
+        }
+
+        return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        mLocationLabel.setText(getLocality);
+        locationForDaily = (getLocality);
+        if (getLocality == null) {
+
+            mLocationLabel.setText(getAdminArea);
+            locationForDaily = (getAdminArea);
+
+
+
+        }
+
+    }
+}
 }
 

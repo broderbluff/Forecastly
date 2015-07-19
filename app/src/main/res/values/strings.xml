@@ -44,4 +44,17 @@
     <string name="rain">Chance of rain</string>
     <string name="week">Week</string>
     <string name="today">Today</string>
+
+
+
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_fragment">FragmentActivity</string>
+
+
+
+
 </resources>
