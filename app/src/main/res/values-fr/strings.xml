@@ -27,4 +27,9 @@
     <string name="degrees_Text">" degrés."</string>
     <string name="and_it_will">"Il y aura "</string>
     <string name="today">"Aujourd'hui"</string>
+    <string name="close_app_button_title">Fermer</string>
+    <string name="location_dialog_positive_button">Ouvrir les paramètres de localisation</string>
+    <string name="location_dialog_title">Les services de localisation ne sont pas disponibles</string>
+    <string name="location_dialog_message">Les services de localisation est éteint, cette application nécessite de connaître votre position pour obtenir les données météorologiques correctes.\n\nAprès permettant services de localisation, il peut prendre quelques secondes avant que le temps est correct montrant</string>
+
 </resources>

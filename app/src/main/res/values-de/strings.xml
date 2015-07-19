@@ -27,4 +27,9 @@
     <string name="degrees_Text">" grad."</string>
     <string name="and_it_will">"Es wird geben "</string>
     <string name="today">Heute</string>
+    <string name="close_app_button_title">Schließen</string>
+    <string name="location_dialog_positive_button">Öffnen Sie Standorteinstellungen</string>
+    <string name="location_dialog_title">Ortsbezogene Dienste nicht verfügbar</string>
+    <string name="location_dialog_message">Ortungsdienste deaktiviert ist, diese App benötigt, um Ihren Standort, um die richtigen Wetterdaten zu erhalten wissen.\n\nNach ermöglicht Location Services kann es einige Sekunden dauern, bis das richtige Wetter ist, die</string>
+
 </resources>

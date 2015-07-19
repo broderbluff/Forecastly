@@ -3,6 +3,7 @@ package eu.brimir.forecastly.ui;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -16,6 +17,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private double latitude;
     private double longitude;
     private String getLocality;
-   private String getAdminArea;
+    private String getAdminArea;
 
     private String locationForDaily;
     private int year_x;
@@ -72,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean isDatePicked = false;
     private static final int DIALOG_ID = 0;
     private long mTimeMachineValue;
-    private String forecastUrl;
-    private String locale = Locale.getDefault().toString();
+    private Location location;
+    private String locale = Locale.getDefault().getLanguage();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
@@ -175,9 +177,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             intent.putExtra("latitude", latitude);
             intent.putExtra("longitude", longitude);
             intent.putExtra("timeValue", mTimeMachineValue);
-            intent.putExtra("year",year_x);
-            intent.putExtra("month",month_x);
-            intent.putExtra("day",day_x);
+            intent.putExtra("year", year_x);
+            intent.putExtra("month", month_x);
+            intent.putExtra("day", day_x);
             intent.putExtra("location", locationForDaily);
             startActivity(intent);
 
@@ -188,9 +190,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getAddress(double latitude, double longitude) {
 
         GetAddressAsynctask addressAsynctask = new GetAddressAsynctask();
-       addressAsynctask.execute(latitude, longitude);
-
-
+        addressAsynctask.execute(latitude, longitude);
 
 
     }
@@ -214,67 +214,63 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 
         String locale2 = Locale.getDefault().toString();
-        if (locale.equals("sv")){
+        String forecastUrl;
+        if (locale.equals("sv")) {
 
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=sv&units=si&exclude=minutely,flags";
-        }else if(locale.equals("ar")){
+        } else if (locale.equals("ar")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=ar&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("bs")){
+        } else if (locale.equals("bs")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=bs&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("de")){
+        } else if (locale.equals("de")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=de&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("es")){
+        } else if (locale.equals("es")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=es&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("fr")){
+        } else if (locale.equals("fr")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=fr&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("it")){
+        } else if (locale.equals("it")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=it&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("nl")){
+        } else if (locale.equals("nl")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("pl")){
+        } else if (locale.equals("pl")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=pl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("pt")){
+        } else if (locale.equals("pt")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=pt&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("ru")){
+        } else if (locale.equals("ru")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=ru&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("sk")){
+        } else if (locale.equals("sk")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=sk&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("tet")){
+        } else if (locale.equals("tet")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=tet&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("tr")){
+        } else if (locale.equals("tr")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("zh")){
+        } else if (locale.equals("zh")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=zh&units=auto&exclude=minutely,flags";
-        }else if(locale2.equals("en_US")){
+        } else if (locale2.equals("en_US")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?exclude=minutely,flags";
-        }else if(locale2.equals("en_GB")){
+        } else if (locale2.equals("en_GB")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?units=uk2&exclude=minutely,flags";
-        }
-
-
-
-        else{
+        } else {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?units=auto&exclude=minutely,flags";
         }
-
 
 
         if (isNetworkAvailable()) {
@@ -362,8 +358,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
 
-
-        if(locale.equals("en_US")){
+        if (locale.equals("en_US")) {
             if (current.getTemperature() >= 77) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
@@ -373,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         .duration(500)
                         .playOn(findViewById(R.id.temperatureLabel));
             }
-        }else{
+        } else {
             if (current.getTemperature() >= 25) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
@@ -384,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         .playOn(findViewById(R.id.temperatureLabel));
             }
         }
-
 
 
     }
@@ -468,8 +462,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         current.setTimeZone(timezone);
 
 
-
-
         return current;
 
 
@@ -504,20 +496,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the locatioin provider -> use
         // default
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
-
-        provider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(provider);
 
 
-        if (location != null) {
-            System.out.println("Provider " + provider + " has been selected.");
-            onLocationChanged(location);
+        if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+
+            builder.setTitle(R.string.location_dialog_title)
+                    .setMessage(R.string.location_dialog_message)
+                    .setNegativeButton(R.string.close_app_button_title, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            paramDialogInterface.dismiss();
+
+                        }
+                    })
+                    .setPositiveButton(R.string.location_dialog_positive_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+
+                            startActivity(myIntent);
+                        }
+                    });
+
+            android.app.AlertDialog dialog = builder.create();
+
+
+            dialog.show();
+
+        } else {
+            GetLocationAsyncTask locationAsyncTask = new GetLocationAsyncTask();
+            locationAsyncTask.execute();
         }
 
 
@@ -526,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
+
         locationManager.requestLocationUpdates(provider, 400, 1, this);
         getLocation();
 
@@ -581,53 +593,84 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
-private class GetAddressAsynctask extends AsyncTask<Object, Void, Void >{
+    private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
 
-    @Override
-    protected Void doInBackground(Object... location) {
+        @Override
+        protected Void doInBackground(Object... location) {
 
-        double latitude = (Double) location[0];
-        double longiitude = (Double) location[1];
-        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = gcd.getFromLocation(latitude,
-                    longitude, 1);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            double latitude = (Double) location[0];
+            double longitude = (Double) location[1];
+            Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = gcd.getFromLocation(latitude,
+                        longitude, 1);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+
+            if (addresses != null && addresses.size() > 0) {
+
+
+                getLocality = (addresses.get(0).getLocality());
+
+                getAdminArea = (addresses.get(0).getLocality());
+
+            }
+
+            return null;
         }
 
 
-        if (addresses != null && addresses.size() > 0) {
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mLocationLabel.setText(getLocality);
+            locationForDaily = (getLocality);
+            if (getLocality == null) {
+
+                mLocationLabel.setText(getAdminArea);
+                locationForDaily = (getAdminArea);
 
 
-
-            getLocality = (addresses.get(0).getLocality());
-
-            getAdminArea = (addresses.get(0).getLocality());
+            }
 
         }
+    }
+    private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void >{
 
-        return null;
+        @Override
+        protected Void doInBackground(Object... params) {
+
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+            criteria.setAltitudeRequired(false);
+            criteria.setBearingRequired(false);
+            criteria.setCostAllowed(true);
+            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+
+            provider = locationManager.getBestProvider(criteria, true);
+
+            location = locationManager.getLastKnownLocation(provider);
+
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+            if (location != null) {
+                System.out.println("Provider " + provider + " has been selected.");
+                onLocationChanged(location);
+            }
+        }
     }
 
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        mLocationLabel.setText(getLocality);
-        locationForDaily = (getLocality);
-        if (getLocality == null) {
-
-            mLocationLabel.setText(getAdminArea);
-            locationForDaily = (getAdminArea);
-
-
-
-        }
-
-    }
-}
 }
 

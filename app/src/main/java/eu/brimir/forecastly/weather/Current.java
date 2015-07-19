@@ -17,7 +17,7 @@ public class Current {
     private String mPrecipType;
     private String mSummary;
     private String mTimeZone;
-    private String locale = Locale.getDefault().getLanguage().toString();
+    private String locale = Locale.getDefault().getLanguage();
 
     public String getTimeZone() {
         return mTimeZone;

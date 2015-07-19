@@ -27,4 +27,9 @@
     <string name="week">أسبوع</string>
     <string name="rain">فرصة للمطر</string>
     <string name="today">اليوم</string>
+    <string name="close_app_button_title">قريب</string>
+    <string name="location_dialog_positive_button">إعدادات الموقع مفتوحة</string>
+
+    <string name="location_dialog_title">خدمات الموقع غير متوفرة</string>
+    <string name="location_dialog_message">يتم تشغيل خدمات الموقع حالا، هذا التطبيق يتطلب أن تعرف موقعك للحصول على بيانات الطقس الصحيحة. \n \n بعد تمكين خدمات الموقع قد يستغرق بضع ثوان قبل الطقس الصحيح هو إظهار</string>
 </resources>
