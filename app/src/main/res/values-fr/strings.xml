@@ -31,5 +31,8 @@
     <string name="location_dialog_positive_button">Ouvrir les paramètres de localisation</string>
     <string name="location_dialog_title">Les services de localisation ne sont pas disponibles</string>
     <string name="location_dialog_message">Les services de localisation est éteint, cette application nécessite de connaître votre position pour obtenir les données météorologiques correctes.\n\nAprès permettant services de localisation, il peut prendre quelques secondes avant que le temps est correct montrant</string>
+    <string name="precip_dialog_message1">"Jusqu'à "</string>
+    <string name="precip_dialog_message2">"mm par heure"</string>
+    <string name="precip_dialog_title">Combien de précipitations</string>
 
 </resources>

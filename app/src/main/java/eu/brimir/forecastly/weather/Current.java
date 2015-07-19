@@ -17,6 +17,35 @@ public class Current {
     private String mPrecipType;
     private String mSummary;
     private String mTimeZone;
+    private double mPrecipIntensity;
+    private double mNearestStormDistance;
+    private double mNearestStormBearing;
+
+    public double getPrecipIntensity() {
+
+        return mPrecipIntensity;
+    }
+
+    public void setPrecipIntensity(double precipIntensity) {
+        mPrecipIntensity = precipIntensity;
+    }
+
+    public double getNearestStormDistance() {
+        return mNearestStormDistance;
+    }
+
+    public void setNearestStormDistance(double nearestStormDistance) {
+        mNearestStormDistance = nearestStormDistance;
+    }
+
+    public double getNearestStormBearing() {
+        return mNearestStormBearing;
+    }
+
+    public void setNearestStormBearing(double nearestStormBearing) {
+        mNearestStormBearing = nearestStormBearing;
+    }
+
     private String locale = Locale.getDefault().getLanguage();
 
     public String getTimeZone() {

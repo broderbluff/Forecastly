@@ -1,5 +1,7 @@
 package eu.brimir.forecastly.ui;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -20,7 +22,9 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private long mTimeMachineValue;
     private Location location;
     private String locale = Locale.getDefault().getLanguage();
+    private String localeUS = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
@@ -213,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String apiKey = "6d73ebc175b9afd40c6e48e5700ca316";
 
 
-        String locale2 = Locale.getDefault().toString();
+
         String forecastUrl;
         if (locale.equals("sv")) {
 
@@ -261,10 +266,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else if (locale.equals("zh")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=zh&units=auto&exclude=minutely,flags";
-        } else if (locale2.equals("en_US")) {
+        } else if (localeUS.equals("en_US")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?exclude=minutely,flags";
-        } else if (locale2.equals("en_GB")) {
+        } else if (localeUS.equals("en_GB")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?units=uk2&exclude=minutely,flags";
         } else {
@@ -347,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mTimeLabel.setText(current.getFormattedTime());
         mHumidityValue.setText(current.getHumidity() + "%");
         mPrecipValue.setText(current.getPrecipChance() + "%");
+
         mSummaryLabel.setText(current.getSummary());
         @SuppressWarnings("deprecation") Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
@@ -456,7 +462,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
             current.setPrecipType(currently.getString("precipType"));
+            current.setPrecipIntensity(currently.getDouble("precipIntensity"));
         }
+
         current.setSummary(currently.getString("summary"));
         current.setTemperature(currently.getDouble("temperature"));
         current.setTimeZone(timezone);
@@ -539,7 +547,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
 
         locationManager.requestLocationUpdates(provider, 400, 1, this);
-        getLocation();
+
 
 
     }
@@ -593,6 +601,51 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
+
+    @OnClick(R.id.precipValue)
+    public void openPrecipDialog(View view){
+        Current current = mForecast.getCurrent();
+        if(!mPrecipValue.equals("0%")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater=MainActivity.this.getLayoutInflater();
+            @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+
+            builder.setView(layout);
+
+
+            TextView title = (TextView)layout.findViewById(R.id.pickedDayTextView);
+            TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
+            ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
+            Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+            title.setText(R.string.precip_dialog_title);
+            if (localeUS.equals("en_US")){
+                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ current.getPrecipIntensity()+ " inches per hour" + "\n");
+            }else{
+                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ current.getPrecipIntensity()+ getString(R.string.precip_dialog_message2) + "\n");
+            }
+
+
+
+            final AlertDialog dialog = builder.create();
+            okButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+
+
+
+
+            dialog.show();
+
+        }
+
+    }
+
+
+
+
     private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
 
         @Override
@@ -645,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         protected Void doInBackground(Object... params) {
 
             Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
             criteria.setAltitudeRequired(false);
             criteria.setBearingRequired(false);
             criteria.setCostAllowed(true);

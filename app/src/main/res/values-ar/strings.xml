@@ -32,4 +32,7 @@
 
     <string name="location_dialog_title">خدمات الموقع غير متوفرة</string>
     <string name="location_dialog_message">يتم تشغيل خدمات الموقع حالا، هذا التطبيق يتطلب أن تعرف موقعك للحصول على بيانات الطقس الصحيحة. \n \n بعد تمكين خدمات الموقع قد يستغرق بضع ثوان قبل الطقس الصحيح هو إظهار</string>
+    <string name="precip_dialog_message1">" حتى"</string>
+    <string name="precip_dialog_message2">"ملم في الساعة"</string>
+    <string name="precip_dialog_title">كم هطول الأمطار</string>
 </resources>

@@ -32,5 +32,8 @@
     <string name="location_dialog_positive_button">Open Location Settings</string>
     <string name="location_dialog_title">Location services not available</string>
     <string name="location_dialog_message">Location services is turned off, this app requires to know your location to get the correct weather data.\n\nAfter enabling Location Services it may take a few seconds before the correct weather is showing</string>
+    <string name="precip_dialog_title">How much precipitation</string>
+    <string name="precip_dialog_message1">"Up to "</string>
+    <string name="precip_dialog_message2">"mm per hour"</string>
 
 </resources>

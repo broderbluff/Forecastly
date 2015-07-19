@@ -32,4 +32,7 @@
 
     <string name="location_dialog_title">Usluge lokacije nije dostupan</string>
     <string name="location_dialog_message">Usluge lokacije je isključen, ovaj app zahtijeva da zna svoju lokaciju dobiti ispravne vremenskih podataka.\n\nNakon omogućava Lokacija usluge može potrajati nekoliko sekundi prije nego što je ispravno vrijeme pokazuje</string>
+    <string name="precip_dialog_message1">"Do "</string>
+    <string name="precip_dialog_message2">"mm na sat"</string>
+    <string name="precip_dialog_title">Koliko padavina</string>
 </resources>

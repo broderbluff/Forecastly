@@ -31,5 +31,8 @@
     <string name="location_dialog_positive_button">Configuración de ubicación Abiertas</string>
     <string name="location_dialog_title">Los servicios de localización no disponible</string>
     <string name="location_dialog_message">Servicios de ubicación está desactivada, esta aplicación requiere conocer su ubicación para obtener los datos del tiempo correctos.\n\nDespués permitiendo servicios de ubicación puede tardar unos segundos antes de que el tiempo correcto es mostrar</string>
+    <string name="precip_dialog_message1">"Hasta "</string>
+    <string name="precip_dialog_message2">"mm por hora"</string>
+    <string name="precip_dialog_title">¿Cuánta precipitación</string>
 
 </resources>
