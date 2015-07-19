@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
+    private static final long MIN_UPDATE_TIME = 1000 * 60 * 5;
+    private static final long MIN_UPDATE_DISTANCE= 500;
     private Forecast mForecast;
     private String provider;
     private LocationManager locationManager;
@@ -536,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
+        locationManager.requestLocationUpdates(provider, MIN_UPDATE_TIME, MIN_UPDATE_DISTANCE, this);
         getLocation();
 
 
