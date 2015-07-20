@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,7 +57,8 @@ public class DayAdapter extends BaseAdapter {
             holder.temperatureLabel = (TextView) convertView.findViewById(R.id.temperatureLabel);
             holder.dayLabel = (TextView) convertView.findViewById(R.id.dayNameLabel);
             holder.windSpeedLabel = (TextView) convertView.findViewById(R.id.windSpeedLabel);
-            holder.windBearingLabel = (TextView) convertView.findViewById(R.id.windBearingLabel);
+
+            holder.windBearingImageView = (ImageView) convertView.findViewById(R.id.windBearingImageView);
 
 
             convertView.setTag(holder);
@@ -72,11 +75,7 @@ public class DayAdapter extends BaseAdapter {
         }else{
             holder.dayLabel.setText(day.getDayOfTheWeek());
         }
-        if(locale.equals("en_US")){
-            holder.windSpeedLabel.setText(day.getWindSpeed() + " mph");
-        }else if(locale.equals("sv_SE")){
-            holder.windSpeedLabel.setText(day.getWindSpeed() + " m/s");
-        }else if(locale.equals("en_GB")) {
+        if(locale.equals("en_US")||locale.equals("en_GB")){
             holder.windSpeedLabel.setText(day.getWindSpeed() + " mph");
         }else{
             holder.windSpeedLabel.setText(day.getWindSpeed() + " m/s");
@@ -93,42 +92,20 @@ public class DayAdapter extends BaseAdapter {
                     .playOn(convertView.findViewById(R.id.temperatureLabel));
         }
         String bearingText;
+        float toDegrees = (float) day.getWindBearing();
 
 
-        if (locale.equals("sv_SE")){
-            if ((360 >= day.getWindBearing() && day.getWindBearing() >= 337.5) || (0 <= day.getWindBearing() && day.getWindBearing() <= 22.5))
-                bearingText = "N";
-            else if (day.getWindBearing() > 22.5 && day.getWindBearing() < 67.5) bearingText = "NO";
-            else if (day.getWindBearing() >= 67.5 && day.getWindBearing() <= 112.5) bearingText = "Ö";
-            else if (day.getWindBearing() > 112.5 && day.getWindBearing() < 157.5) bearingText = "SO";
-            else if (day.getWindBearing() >= 157.5 && day.getWindBearing() <= 202.5) bearingText = "S";
-            else if (day.getWindBearing() > 202.5 && day.getWindBearing() < 247.5) bearingText = "SV";
-            else if (day.getWindBearing() >= 247.5 && day.getWindBearing() <= 292.5) bearingText = "V";
-            else if (day.getWindBearing() > 292.5 && day.getWindBearing() < 337.5) bearingText = "NV";
-            else bearingText = "?";
-            holder.windBearingLabel.setText(bearingText);
-        }else {
+        Animation ani = new RotateAnimation(
+                0, /* from degree*/
+                -toDegrees, /* to degree */
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        ani.setDuration(700);
+        ani.setFillAfter(true);
 
 
-            if ((360 >= day.getWindBearing() && day.getWindBearing() >= 337.5) || (0 <= day.getWindBearing() && day.getWindBearing() <= 22.5))
-                bearingText = "N";
-            else if (day.getWindBearing() > 22.5 && day.getWindBearing() < 67.5) bearingText = "NE";
-            else if (day.getWindBearing() >= 67.5 && day.getWindBearing() <= 112.5)
-                bearingText = "E";
-            else if (day.getWindBearing() > 112.5 && day.getWindBearing() < 157.5)
-                bearingText = "SE";
-            else if (day.getWindBearing() >= 157.5 && day.getWindBearing() <= 202.5)
-                bearingText = "S";
-            else if (day.getWindBearing() > 202.5 && day.getWindBearing() < 247.5)
-                bearingText = "SW";
-            else if (day.getWindBearing() >= 247.5 && day.getWindBearing() <= 292.5)
-                bearingText = "W";
-            else if (day.getWindBearing() > 292.5 && day.getWindBearing() < 337.5)
-                bearingText = "NW";
-            else bearingText = "?";
-            holder.windBearingLabel.setText(bearingText);
+        holder.windBearingImageView.startAnimation(ani);
 
-        }
+
         return convertView;
     }
 
@@ -137,7 +114,7 @@ public class DayAdapter extends BaseAdapter {
         TextView temperatureLabel;
         TextView dayLabel;
         TextView windSpeedLabel;
-        TextView windBearingLabel;
+        ImageView windBearingImageView;
 
     }
 }

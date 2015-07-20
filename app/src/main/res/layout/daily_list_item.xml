@@ -64,20 +64,13 @@
         android:layout_alignParentEnd="true"
         android:layout_toRightOf="@+id/dayNameLabel"
         android:layout_toEndOf="@+id/dayNameLabel"
-        android:gravity="right">
+        android:gravity="center|right">
 
-        <TextView
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-           tools:text="N"
-            android:id="@+id/windBearingLabel"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:gravity="right"
-            android:layout_marginRight="5dp"/>
+            android:id="@+id/windBearingImageView"
+            android:src="@drawable/arrow"/>
 
         <TextView
             android:layout_width="40dp"
@@ -90,5 +83,6 @@
             android:layout_toLeftOf="@+id/windBearingLabel"
             android:layout_toStartOf="@+id/windBearingLabel"
             android:gravity="right"/>
+
     </LinearLayout>
 </RelativeLayout>

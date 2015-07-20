@@ -44,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 500;
+    private static final long MIN_TIME_FOR_UPDATE = 1000*60*5;
     private Forecast mForecast;
     private String provider;
     private LocationManager locationManager;
@@ -347,7 +350,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void updateDisplay() {
         Current current = mForecast.getCurrent();
-
+        if (latitude == 0.0 && longitude == 0.0) {
+            mTemperatureLabel.setText("--");
+        }
         mTemperatureLabel.setText(current.getTemperature() + "");
         mTimeLabel.setText(current.getFormattedTime());
         mHumidityValue.setText(current.getHumidity() + "%");
@@ -359,13 +364,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (current.getPrecipChance() != 0) {
             mPrecipLabel.setText(current.getPrecipType());
         }
-        if (latitude == 0.0 && longitude == 0.0) {
-            mTemperatureLabel.setText("--");
-        }
+
 
 
         if (locale.equals("en_US")) {
-            if (current.getTemperature() >= 77) {
+            if (current.getTemperature() >= 77&& latitude != 0.0 && longitude != 0.0 ) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -375,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         .playOn(findViewById(R.id.temperatureLabel));
             }
         } else {
-            if (current.getTemperature() >= 25) {
+            if (current.getTemperature() >= 25 && mTemperatureLabel.equals("--")) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -546,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onResume() {
         super.onResume();
 
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
+        locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
 
 
@@ -618,10 +621,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
             Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
             title.setText(R.string.precip_dialog_title);
+            DecimalFormat form = new DecimalFormat("0.00");
             if (localeUS.equals("en_US")){
-                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ current.getPrecipIntensity()+ " inches per hour" + "\n");
+                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ form.format(current.getPrecipIntensity())+ " inches per hour" + "\n");
             }else{
-                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ current.getPrecipIntensity()+ getString(R.string.precip_dialog_message2) + "\n");
+                message.setText( "\n" +getString(R.string.precip_dialog_message1)+  form.format(current.getPrecipIntensity())+ getString(R.string.precip_dialog_message2) + "\n");
             }
 
 
