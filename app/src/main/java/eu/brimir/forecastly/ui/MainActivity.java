@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
@@ -24,6 +25,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -65,15 +70,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 500;
-    private static final long MIN_TIME_FOR_UPDATE = 1000*60*5;
+    private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 5;
     private Forecast mForecast;
     private String provider;
     private LocationManager locationManager;
     private double latitude;
     private double longitude;
     private String getLocality;
-    private String getAdminArea;
-
+    private boolean stormAlert = false;
+    private List<Address> addresses;
     private String locationForDaily;
     private int year_x;
     private int month_x;
@@ -85,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String locale = Locale.getDefault().getLanguage();
     private String localeUS = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private AnimationDrawable alertAnimation;
 
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
@@ -119,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Bind(R.id.timemachine)
     ImageView mTimeMachine;
+
+
+    @Bind(R.id.alertImageView)
+    ImageView mAlertImage;
     // private SwipeRefreshLayout swipeLayout;
 
 
@@ -130,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mAlertImage.setVisibility(View.INVISIBLE);
+
         mProgressBar.setVisibility(View.INVISIBLE);
 
         getLocation();
@@ -139,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         year_x = cal.get(Calendar.YEAR);
         month_x = cal.get(Calendar.MONTH);
         day_x = cal.get(Calendar.DAY_OF_MONTH);
+
 
         mTimeMachine.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +173,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
 
+    }
+
+    private void alertIconAnimation(ImageView img) {
+        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
+        img.startAnimation(animation);
+
+
+        img.setBackgroundResource(R.drawable.alertanimation);
+        alertAnimation = (AnimationDrawable) img.getBackground();
+        alertAnimation.start();
     }
 
 
@@ -219,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void getForecast(double latitude, double longitude) {
         String apiKey = "6d73ebc175b9afd40c6e48e5700ca316";
-
 
 
         String forecastUrl;
@@ -350,6 +375,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void updateDisplay() {
         Current current = mForecast.getCurrent();
+
+        if(stormAlert){
+           mAlertImage.setVisibility(View.VISIBLE);
+        }else{
+            mAlertImage.setVisibility(View.INVISIBLE);
+        }
         if (latitude == 0.0 && longitude == 0.0) {
             mTemperatureLabel.setText("--");
         }
@@ -366,9 +397,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
 
-
         if (locale.equals("en_US")) {
-            if (current.getTemperature() >= 77&& latitude != 0.0 && longitude != 0.0 ) {
+            if (current.getTemperature() >= 77 && latitude != 0.0 && longitude != 0.0) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -462,7 +492,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         current.setHumidity(currently.getDouble("humidity"));
         current.setTime(currently.getLong("time"));
         current.setIcon(currently.getString("icon"));
-        current.setPrecipChance(currently.getDouble("precipProbability"));
+        if(currently.has("nearestStormDistance")) {
+            current.setNearestStormDistance(currently.getDouble("nearestStormDistance"));
+            current.setNearestStormBearing(currently.getDouble("nearestStormBearing"));
+            alertIconAnimation(mAlertImage);
+            stormAlert = true;
+        }
+                  current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
             current.setPrecipType(currently.getString("precipType"));
             current.setPrecipIntensity(currently.getDouble("precipIntensity"));
@@ -477,6 +513,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 
     }
+
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -552,7 +589,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
 
-
     }
 
     @Override
@@ -563,7 +599,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        latitude = location.getLatitude();
+
+     // latitude =  37.82675;
+        // longitude =-122.423;
+       latitude = location.getLatitude();
         longitude = location.getLongitude();
         getForecast(latitude, longitude);
         getAddress(latitude, longitude);
@@ -603,31 +642,92 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         intent.putExtra("location", locationForDaily);
         startActivity(intent);
     }
+    @OnClick(R.id.alertImageView)
+    public void openAlertActivity(View view){
+        Current current = mForecast.getCurrent();
+
+        float toDegrees = (float) current.getNearestStormBearing();
+       int distanceStorm = (int) Math.round(current.getNearestStormDistance());
+
+
+
+
+
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater=MainActivity.this.getLayoutInflater();
+        @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog_alert,null);
+
+        builder.setView(layout);
+
+
+
+       ImageView arrow = (ImageView)layout.findViewById(R.id.alertDialogArrow);
+        TextView distance = (TextView)layout.findViewById(R.id.distanceToStormTextView);
+
+        if(localeUS.equals("en_US")){
+            distance.setText(distanceStorm+" miles away");
+        }else {
+            distance.setText(distanceStorm+getString(R.string.alert_dialog_km_away));
+        }
+
+
+        Animation ani = new RotateAnimation(
+                0, /* from degree*/
+                toDegrees, /* to degree */
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        ani.setDuration(1000);
+        ani.setFillAfter(true);
+       arrow.startAnimation(ani);
+
+        Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+
+
+        final AlertDialog dialog = builder.create();
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+
+
+        dialog.show();
+
+
+
+
+
+
+
+    }
 
 
     @OnClick(R.id.precipValue)
-    public void openPrecipDialog(View view){
+    public void openPrecipDialog(View view) {
         Current current = mForecast.getCurrent();
-        if(!mPrecipValue.equals("0%")){
+        if (!mPrecipValue.equals("0%")) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater=MainActivity.this.getLayoutInflater();
-            @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog, null);
 
             builder.setView(layout);
 
 
-            TextView title = (TextView)layout.findViewById(R.id.pickedDayTextView);
-            TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
-            ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
-            Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+            TextView title = (TextView) layout.findViewById(R.id.pickedDayTextView);
+            TextView message = (TextView) layout.findViewById(R.id.contentAlertDIalogTextView);
+            ImageView icon = (ImageView) layout.findViewById(R.id.iconImageViewAlert);
+            Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
             title.setText(R.string.precip_dialog_title);
             DecimalFormat form = new DecimalFormat("0.00");
-            if (localeUS.equals("en_US")){
-                message.setText( "\n" +getString(R.string.precip_dialog_message1)+ form.format(current.getPrecipIntensity())+ " inches per hour" + "\n");
-            }else{
-                message.setText( "\n" +getString(R.string.precip_dialog_message1)+  form.format(current.getPrecipIntensity())+ getString(R.string.precip_dialog_message2) + "\n");
+            if (localeUS.equals("en_US")) {
+                message.setText("\n" + getString(R.string.precip_dialog_message1) + form.format(current.getPrecipIntensity()) + " inches per hour" + "\n");
+            } else {
+                message.setText("\n" + getString(R.string.precip_dialog_message1) + form.format(current.getPrecipIntensity()) + getString(R.string.precip_dialog_message2) + "\n");
             }
-
 
 
             final AlertDialog dialog = builder.create();
@@ -639,15 +739,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             });
 
 
-
-
             dialog.show();
 
         }
 
     }
-
-
 
 
     private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
@@ -658,7 +754,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             double latitude = (Double) location[0];
             double longitude = (Double) location[1];
             Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
-            List<Address> addresses = null;
+
+            addresses = null;
             try {
                 addresses = gcd.getFromLocation(latitude,
                         longitude, 1);
@@ -670,10 +767,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             if (addresses != null && addresses.size() > 0) {
 
+                if ((addresses.get(0).getLocality() != null)) {
 
-                getLocality = (addresses.get(0).getLocality());
+                    getLocality = addresses.get(0).getLocality();
+                    locationForDaily = getLocality;
+                } else {
+                    getLocality = addresses.get(0).getAddressLine(0);
+                    locationForDaily = getLocality;
+                }
 
-                getAdminArea = (addresses.get(0).getLocality());
 
             }
 
@@ -684,19 +786,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             mLocationLabel.setText(getLocality);
-            locationForDaily = (getLocality);
-            if (getLocality == null) {
 
-                mLocationLabel.setText(getAdminArea);
-                locationForDaily = (getAdminArea);
-
-
-            }
 
         }
+
     }
-    private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void >{
+
+    private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void> {
 
         @Override
         protected Void doInBackground(Object... params) {

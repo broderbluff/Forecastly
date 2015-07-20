@@ -21,6 +21,7 @@ public class Current {
     private double mNearestStormDistance;
     private double mNearestStormBearing;
 
+
     public double getPrecipIntensity() {
 
         return mPrecipIntensity;

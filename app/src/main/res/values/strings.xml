@@ -52,6 +52,9 @@
     <string name="precip_dialog_title">How much precipitation</string>
     <string name="precip_dialog_message1">"Up to "</string>
     <string name="precip_dialog_message2">"mm per hour"</string>
+    <string name="dialog_alert_title">Approaching storm</string>
+    <string name="alert_dialog_alert_title">Storm Alert!</string>
+    <string name="alert_dialog_km_away">" km away"</string>
 
 
 </resources>

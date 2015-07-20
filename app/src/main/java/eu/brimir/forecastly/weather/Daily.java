@@ -19,8 +19,15 @@ public class Daily implements Parcelable{
     private double mWindSpeed;
     private double mWindBearing;
     private String mLocation;
+    private double mStoreBearing;
 
+    public double getStoreBearing() {
+        return mStoreBearing;
+    }
 
+    public void setStoreBearing(double storeBearing) {
+        mStoreBearing = storeBearing;
+    }
 
     public double getWindBearing() {
         return mWindBearing;

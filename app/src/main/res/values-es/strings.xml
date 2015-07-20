@@ -34,5 +34,8 @@
     <string name="precip_dialog_message1">"Hasta "</string>
     <string name="precip_dialog_message2">"mm por hora"</string>
     <string name="precip_dialog_title">¿Cuánta precipitación</string>
+    <string name="alert_dialog_alert_title">Alerta de tormenta!</string>
+    <string name="alert_dialog_km_away">" km de distancia"</string>
+    <string name="dialog_alert_title">Tormenta que se avecina</string>
 
 </resources>

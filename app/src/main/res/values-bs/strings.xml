@@ -35,4 +35,7 @@
     <string name="precip_dialog_message1">"Do "</string>
     <string name="precip_dialog_message2">"mm na sat"</string>
     <string name="precip_dialog_title">Koliko padavina</string>
+    <string name="alert_dialog_alert_title">Oluja upozorenja!</string>
+    <string name="alert_dialog_km_away">" km dalje"</string>
+    <string name="dialog_alert_title">Približavanje oluje</string>
 </resources>

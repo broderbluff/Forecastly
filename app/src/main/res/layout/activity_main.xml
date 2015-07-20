@@ -162,6 +162,15 @@
             android:layout_alignParentEnd="true"/>
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/alertImageView"
+        android:layout_below="@+id/timeLabel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="9dp"
+        android:focusableInTouchMode="false"/>
+
 
 </RelativeLayout>
 
@@ -228,7 +237,8 @@
         android:layout_alignEnd="@+id/refreshImageView"
 
         android:layout_alignLeft="@+id/refreshImageView"
-        android:layout_alignStart="@+id/refreshImageView"/>
+        android:layout_alignStart="@+id/refreshImageView"
+        android:layout_alignTop="@+id/refreshImageView"/>
 
 
 

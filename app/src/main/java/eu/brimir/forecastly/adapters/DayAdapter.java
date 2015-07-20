@@ -1,6 +1,8 @@
 package eu.brimir.forecastly.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,20 +93,37 @@ public class DayAdapter extends BaseAdapter {
                     .duration(500)
                     .playOn(convertView.findViewById(R.id.temperatureLabel));
         }
-        String bearingText;
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        // The SharedPreferences editor - must use commit() to submit changes
+        SharedPreferences.Editor editor = preferences.edit();
+
+        // Edit the saved preferences
+
+
+       float fromDegrees = preferences.getFloat("bearing", 0);
+
+
+
+
         float toDegrees = (float) day.getWindBearing();
 
 
         Animation ani = new RotateAnimation(
-                0, /* from degree*/
+               fromDegrees, /* from degree*/
                 -toDegrees, /* to degree */
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        ani.setDuration(700);
+        ani.setDuration(1000);
         ani.setFillAfter(true);
 
 
         holder.windBearingImageView.startAnimation(ani);
+        if (-fromDegrees != -toDegrees){
 
+            editor.putFloat("bearing",  -toDegrees);
+            editor.commit();
+
+        }
 
         return convertView;
     }

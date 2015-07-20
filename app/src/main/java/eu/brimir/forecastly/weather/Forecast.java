@@ -11,6 +11,15 @@ public class Forecast {
     private Hourly[] mHourlyForecast;
     private Daily[] mDailyForecast;
     private TimeMachine mTimeMachine;
+    private Alert mAlert;
+
+    public Alert getAlert() {
+        return mAlert;
+    }
+
+    public void setAlert(Alert alert) {
+        mAlert = alert;
+    }
 
     public TimeMachine getTimeMachine() {
         return mTimeMachine;
