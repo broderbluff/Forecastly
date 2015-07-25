@@ -144,8 +144,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mProgressBar.setVisibility(View.INVISIBLE);
 
         getLocation();
-        getForecast(latitude, longitude);
-        getAddress(latitude, longitude);
+        if(latitude != 0 && longitude != 0){
+            getAddress(latitude, longitude);
+            getForecast(latitude, longitude);
+
+
+        }else{
+            getLocation();
+            getAddress(latitude, longitude);
+            getForecast(latitude, longitude);
+        }
+
+
+
+
         final Calendar cal = Calendar.getInstance();
         year_x = cal.get(Calendar.YEAR);
         month_x = cal.get(Calendar.MONTH);
@@ -165,8 +177,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onClick(View v) {
                 getLocation();
-                getForecast(latitude, longitude);
                 getAddress(latitude, longitude);
+                getForecast(latitude, longitude);
+
 
 
             }
@@ -408,7 +421,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         .playOn(findViewById(R.id.temperatureLabel));
             }
         } else {
-            if (current.getTemperature() >= 25 && mTemperatureLabel.equals("--")) {
+            String label = mTemperatureLabel.getText().toString();
+            if (current.getTemperature() >= 25 && label.equals("--")) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -453,6 +467,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             day.setTimezone(timezone);
             day.setWindSpeed(jsonDay.getDouble("windSpeed"));
             day.setWindBearing(jsonDay.getDouble("windBearing"));
+            day.setPrecipIntensityMax(jsonDay.getDouble("precipIntensityMax"));
+            day.setPrecipProbability(jsonDay.getDouble("precipProbability"));
+            if(jsonDay.has("precipType")){
+                day.setPrecipType(jsonDay.getString("precipType"));
+            }
+
+
+
 
             days[i] = day;
 
@@ -585,7 +607,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
-
+        if(provider.isEmpty()){
+            getLocation();
+        }
         locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
 
@@ -600,10 +624,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onLocationChanged(Location location) {
 
-     // latitude =  37.82675;
-        // longitude =-122.423;
-       latitude = location.getLatitude();
-        longitude = location.getLongitude();
+    //latitude =  37.82675;
+        //longitude =-122.423;
+      latitude = location.getLatitude();
+       longitude = location.getLongitude();
         getForecast(latitude, longitude);
         getAddress(latitude, longitude);
 
@@ -709,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @OnClick(R.id.precipValue)
     public void openPrecipDialog(View view) {
         Current current = mForecast.getCurrent();
-        if (!mPrecipValue.equals("0%")) {
+        if (current.getPrecipChance() != 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = MainActivity.this.getLayoutInflater();
             @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog, null);

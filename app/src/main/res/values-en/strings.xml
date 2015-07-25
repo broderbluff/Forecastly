@@ -38,5 +38,7 @@
     <string name="dialog_alert_title">Approaching storm</string>
     <string name="alert_dialog_alert_title">Storm Alert!</string>
     <string name="alert_dialog_km_away">" km away"</string>
+    <string name="daily_upto">"Up to "</string>
+    <string name="daily_mmanhour">mm an hour</string>
 
 </resources>

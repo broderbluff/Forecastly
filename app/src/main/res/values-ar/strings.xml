@@ -38,4 +38,6 @@
     <string name="alert_dialog_alert_title">تنبيه العاصفة!</string>
     <string name="alert_dialog_km_away">"كم"</string>
     <string name="dialog_alert_title">تقترب العاصفة</string>
+    <string name="daily_mmanhour">ملم في الساعة</string>
+    <string name="daily_upto">"حتى"</string>
 </resources>

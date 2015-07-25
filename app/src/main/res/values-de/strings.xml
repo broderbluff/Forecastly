@@ -37,5 +37,7 @@
     <string name="alert_dialog_alert_title">Sturm-Alarm!</string>
     <string name="alert_dialog_km_away">" km entfernt"</string>
     <string name="dialog_alert_title">Nähern des Sturmes</string>
+    <string name="daily_mmanhour">mm pro Stunde</string>
+    <string name="daily_upto">"Bis zu "</string>
 
 </resources>

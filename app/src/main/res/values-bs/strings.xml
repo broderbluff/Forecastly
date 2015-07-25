@@ -38,4 +38,6 @@
     <string name="alert_dialog_alert_title">Oluja upozorenja!</string>
     <string name="alert_dialog_km_away">" km dalje"</string>
     <string name="dialog_alert_title">Približavanje oluje</string>
+    <string name="daily_mmanhour">mm po satu</string>
+    <string name="daily_upto">"Do "</string>
 </resources>

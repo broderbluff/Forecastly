@@ -135,5 +135,6 @@ public class DayAdapter extends BaseAdapter {
         TextView windSpeedLabel;
         ImageView windBearingImageView;
 
+
     }
 }
