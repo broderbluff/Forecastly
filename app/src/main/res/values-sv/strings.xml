@@ -33,7 +33,7 @@
     <string name="location_dialog_message">Platstjänster är avstängd, denna app kräver att veta var du befinner dig för att kunna får rätt väderdata.\n\nEfter du har satt igång platstjänster kan det ta några sekunder innan det rätta vädret visas.</string>
     <string name="precip_dialog_message1">"Upp till "</string>
     <string name="precip_dialog_message2">"mm per timme"</string>
-    <string name="precip_dialog_title">Hur mycket nederbörd</string>
+    <string name="precip_dialog_title">Förväntad nederbörd</string>
     <string name="alert_dialog_alert_title">Storm varning!</string>
     <string name="alert_dialog_km_away">" km bort"</string>
     <string name="dialog_alert_title">Storm närmar sig</string>

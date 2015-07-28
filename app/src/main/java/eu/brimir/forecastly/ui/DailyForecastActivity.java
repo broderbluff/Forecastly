@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -75,6 +77,8 @@ public class DailyForecastActivity extends ListActivity {
         TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
         ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
         Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+        TextView precip = (TextView)layout.findViewById(R.id.precipChanceDialogTextView);
+        TextView precipIntenstity = (TextView)layout.findViewById(R.id.precipIntensityMaxTextView);
         title.setText(dayOfTheWeek);
 
         if(precipType.isEmpty()){
@@ -85,7 +89,11 @@ public class DailyForecastActivity extends ListActivity {
 
 
             message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will)
-                    + conditions+ "\n" + "\n" + precipType + ", " + precipProbability + "%"+ "\n" + getString(R.string.precip_dialog_message1) + precipIntensityMax + getString(R.string.daily_mmanhour) );
+                    + conditions+ "\n" );
+
+            precip.setText(precipProbability + "%" + " " + precipType);
+            precipIntenstity.setText(precipIntensityMax + getString(R.string.daily_mmanhour));
+
 
         }
 

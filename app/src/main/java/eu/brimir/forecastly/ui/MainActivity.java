@@ -32,6 +32,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -119,12 +120,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Bind(R.id.yearLabel)
     TextView mLocationLabel;
 
-    @Bind(R.id.precipLabel)
-    TextView mPrecipLabel;
 
     @Bind(R.id.timemachine)
     ImageView mTimeMachine;
-
+    @Bind(R.id.layoutBackground)
+    ImageView mImageviewLayout;
 
     @Bind(R.id.alertImageView)
     ImageView mAlertImage;
@@ -144,18 +144,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mProgressBar.setVisibility(View.INVISIBLE);
 
         getLocation();
-        if(latitude != 0 && longitude != 0){
+        if (latitude != 0 && longitude != 0) {
             getAddress(latitude, longitude);
             getForecast(latitude, longitude);
 
 
-        }else{
+        } else {
             getLocation();
             getAddress(latitude, longitude);
             getForecast(latitude, longitude);
         }
-
-
 
 
         final Calendar cal = Calendar.getInstance();
@@ -179,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 getLocation();
                 getAddress(latitude, longitude);
                 getForecast(latitude, longitude);
-
 
 
             }
@@ -389,9 +386,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void updateDisplay() {
         Current current = mForecast.getCurrent();
 
-        if(stormAlert){
-           mAlertImage.setVisibility(View.VISIBLE);
-        }else{
+
+        if (stormAlert) {
+            mAlertImage.setVisibility(View.VISIBLE);
+            alertIconAnimation(mAlertImage);
+        } else {
             mAlertImage.setVisibility(View.INVISIBLE);
         }
         if (latitude == 0.0 && longitude == 0.0) {
@@ -402,12 +401,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mHumidityValue.setText(current.getHumidity() + "%");
         mPrecipValue.setText(current.getPrecipChance() + "%");
 
+        switch (current.getIcon()) {
+            case "rain":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_bg));
+                break;
+            case "clear-day":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_bg));
+                break;
+            case "partly-cloudy-day":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day));
+                break;
+            case "partly-cloudy-night":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_bg));
+                break;
+            case "clear-night":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_bg));
+                break;
+            case "cloudy":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.overcast));
+                break;
+            case "fog":
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_bg));
+                break;
+        }
         mSummaryLabel.setText(current.getSummary());
         @SuppressWarnings("deprecation") Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
-        if (current.getPrecipChance() != 0) {
-            mPrecipLabel.setText(current.getPrecipType());
-        }
 
 
         if (locale.equals("en_US")) {
@@ -469,11 +488,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             day.setWindBearing(jsonDay.getDouble("windBearing"));
             day.setPrecipIntensityMax(jsonDay.getDouble("precipIntensityMax"));
             day.setPrecipProbability(jsonDay.getDouble("precipProbability"));
-            if(jsonDay.has("precipType")){
+            if (jsonDay.has("precipType")) {
                 day.setPrecipType(jsonDay.getString("precipType"));
             }
-
-
 
 
             days[i] = day;
@@ -514,13 +531,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         current.setHumidity(currently.getDouble("humidity"));
         current.setTime(currently.getLong("time"));
         current.setIcon(currently.getString("icon"));
-        if(currently.has("nearestStormDistance")) {
+        if (currently.has("nearestStormDistance")) {
             current.setNearestStormDistance(currently.getDouble("nearestStormDistance"));
             current.setNearestStormBearing(currently.getDouble("nearestStormBearing"));
-            alertIconAnimation(mAlertImage);
+
             stormAlert = true;
+        }else{
+            stormAlert =false;
         }
-                  current.setPrecipChance(currently.getDouble("precipProbability"));
+        current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
             current.setPrecipType(currently.getString("precipType"));
             current.setPrecipIntensity(currently.getDouble("precipIntensity"));
@@ -607,7 +626,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
-        if(provider.isEmpty()){
+        if (provider.isEmpty()) {
             getLocation();
         }
         locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
@@ -624,10 +643,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onLocationChanged(Location location) {
 
-    //latitude =  37.82675;
-        //longitude =-122.423;
-      latitude = location.getLatitude();
-       longitude = location.getLongitude();
+       // latitude = 1.8175;
+       // longitude =16.4857;
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
         getForecast(latitude, longitude);
         getAddress(latitude, longitude);
 
@@ -666,34 +685,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         intent.putExtra("location", locationForDaily);
         startActivity(intent);
     }
+
     @OnClick(R.id.alertImageView)
-    public void openAlertActivity(View view){
+    public void openAlertActivity(View view) {
         Current current = mForecast.getCurrent();
 
         float toDegrees = (float) current.getNearestStormBearing();
-       int distanceStorm = (int) Math.round(current.getNearestStormDistance());
-
-
-
-
-
+        int distanceStorm = (int) Math.round(current.getNearestStormDistance());
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater=MainActivity.this.getLayoutInflater();
-        @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog_alert,null);
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog_alert, null);
 
         builder.setView(layout);
 
 
+        ImageView arrow = (ImageView) layout.findViewById(R.id.alertDialogArrow);
+        TextView distance = (TextView) layout.findViewById(R.id.distanceToStormTextView);
 
-       ImageView arrow = (ImageView)layout.findViewById(R.id.alertDialogArrow);
-        TextView distance = (TextView)layout.findViewById(R.id.distanceToStormTextView);
-
-        if(localeUS.equals("en_US")){
-            distance.setText(distanceStorm+" miles away");
-        }else {
-            distance.setText(distanceStorm+getString(R.string.alert_dialog_km_away));
+        if (localeUS.equals("en_US")) {
+            distance.setText(distanceStorm + " miles away");
+        } else {
+            distance.setText(distanceStorm + getString(R.string.alert_dialog_km_away));
         }
 
 
@@ -703,9 +717,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         ani.setDuration(1000);
         ani.setFillAfter(true);
-       arrow.startAnimation(ani);
+        arrow.startAnimation(ani);
 
-        Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+        Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
 
 
         final AlertDialog dialog = builder.create();
@@ -717,20 +731,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
 
-
-
         dialog.show();
-
-
-
-
-
 
 
     }
 
 
-    @OnClick(R.id.precipValue)
+    @OnClick(R.id.precipLayout)
     public void openPrecipDialog(View view) {
         Current current = mForecast.getCurrent();
         if (current.getPrecipChance() != 0) {
@@ -744,13 +751,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             TextView title = (TextView) layout.findViewById(R.id.pickedDayTextView);
             TextView message = (TextView) layout.findViewById(R.id.contentAlertDIalogTextView);
             ImageView icon = (ImageView) layout.findViewById(R.id.iconImageViewAlert);
+            ImageView precipIcon = (ImageView) layout.findViewById(R.id.precipIntensityMaxIcon);
             Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
+            LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
+            TextView precipIntenstity = (TextView)layout.findViewById(R.id.precipIntensityMaxTextView);
+
+            icon3.setVisibility(View.GONE);
+
+            if(current.getPrecipType().equals("snow")){
+                precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.snowflaje));
+            }else if (current.getPrecipType().equals("rain")){
+                precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.water));
+            }
             title.setText(R.string.precip_dialog_title);
             DecimalFormat form = new DecimalFormat("0.00");
             if (localeUS.equals("en_US")) {
-                message.setText("\n" + getString(R.string.precip_dialog_message1) + form.format(current.getPrecipIntensity()) + " inches per hour" + "\n");
+               precipIntenstity.setText(form.format(current.getPrecipIntensity()) + " inches per hour");
             } else {
-                message.setText("\n" + getString(R.string.precip_dialog_message1) + form.format(current.getPrecipIntensity()) + getString(R.string.precip_dialog_message2) + "\n");
+                precipIntenstity.setText(form.format(current.getPrecipIntensity()) + getString(R.string.precip_dialog_message2));
             }
 
 
