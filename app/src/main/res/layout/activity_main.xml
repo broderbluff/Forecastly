@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_gradient"/>
+        android:background="#80000000"
+       />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -98,7 +99,7 @@ style="@style/ShadowText"
                     android:id="@+id/humidityValue"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
-
+                    style="@style/ShadowText"
                     android:gravity="center_horizontal"
                     android:text="--"
                     android:textColor="@android:color/white"
@@ -113,6 +114,7 @@ style="@style/ShadowText"
                 android:layout_weight="50"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                style="@style/ShadowText"
                 android:id="@+id/precipLayout">
 
                 <ImageView
@@ -172,7 +174,7 @@ style="@style/ShadowText"
                 android:layout_alignBottom="@+id/temperatureLabel"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-
+                style="@style/ShadowText"
                 android:gravity="center_horizontal"
                 android:text="@string/getting_weather_data"
                 android:textColor="@android:color/white"
@@ -202,21 +204,21 @@ style="@style/ShadowText"
 
         <Button
             android:id="@+id/hourlyButton"
-            style="?android:attr/buttonBarButtonStyle"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:text="@string/hour_label"
             android:textColor="@android:color/white"/>
 
         <Button
             android:id="@+id/sevenDaysButton"
-            style="?android:attr/buttonBarButtonStyle"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:text="@string/seven_days"
             android:textColor="@android:color/white"/>
     </LinearLayout>
@@ -229,7 +231,9 @@ style="@style/ShadowText"
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/timemachine"/>
+        android:src="@drawable/timemachine"
+        android:background="?android:attr/selectableItemBackground"
+/>
 
     <ImageView
         android:id="@+id/refreshImageView"
@@ -239,6 +243,8 @@ style="@style/ShadowText"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
+        android:background="?android:attr/selectableItemBackground"
+
         android:layout_marginTop="5dp"
         android:src="@drawable/refresh"/>
 

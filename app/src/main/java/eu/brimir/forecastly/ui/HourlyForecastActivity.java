@@ -2,12 +2,16 @@ package eu.brimir.forecastly.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -55,19 +59,27 @@ public class HourlyForecastActivity extends ListActivity {
         String highTemp = mHours[position].getTemperature() + "";
         int iconId = mHours[position].getIconId();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater=HourlyForecastActivity.this.getLayoutInflater();
-        @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+        final Dialog dialog = new Dialog(this,
+                android.R.style.Theme_Translucent_NoTitleBar);
+        Window window = dialog.getWindow();
+        window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
 
-        builder.setView(layout);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setContentView(R.layout.dialog);
 
 
-        TextView title = (TextView)layout.findViewById(R.id.pickedDayTextView);
-        TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
-        ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
-        Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
-        LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
-        LinearLayout icon2 = (LinearLayout)layout.findViewById(R.id.linearLayout5);
+
+
+        TextView title = (TextView)dialog.findViewById(R.id.pickedDayTextView);
+        TextView message = (TextView)dialog.findViewById(R.id.contentAlertDIalogTextView);
+        ImageView icon = (ImageView)dialog.findViewById(R.id.iconImageViewAlert);
+        Button okButton = (Button)dialog.findViewById(R.id.alertDialogButton);
+        LinearLayout icon3 = (LinearLayout)dialog.findViewById(R.id.linearlayout132);
+        LinearLayout icon2 = (LinearLayout)dialog.findViewById(R.id.linearLayout5);
 
         icon3.setVisibility(View.GONE);
         icon2.setVisibility(View.GONE);
@@ -75,7 +87,7 @@ public class HourlyForecastActivity extends ListActivity {
         title.setText(pickedHour);
         message.setText(getString(R.string.the_temp_will_text) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will) + conditions);
         icon.setImageResource(iconId);
-        final AlertDialog dialog = builder.create();
+
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

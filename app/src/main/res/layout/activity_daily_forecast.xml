@@ -5,9 +5,9 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
 
-
+    android:background="#80000000"
                 tools:context="eu.brimir.forecastly.ui.DailyForecastActivity"
-                android:background="#F2455A64"
+
                 android:gravity="center">
 
     <ListView

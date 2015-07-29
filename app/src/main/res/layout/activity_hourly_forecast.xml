@@ -5,9 +5,9 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
 
-
+                android:background="#80000000"
                 tools:context="eu.brimir.forecastly.ui.HourlyForecastActivity"
-    android:background="@drawable/bg_gradient">
+  >
 
 
     <TextView
