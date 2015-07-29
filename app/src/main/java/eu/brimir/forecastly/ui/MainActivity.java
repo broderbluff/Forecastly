@@ -1,9 +1,13 @@
 package eu.brimir.forecastly.ui;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
@@ -14,12 +18,21 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +50,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -56,13 +70,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
-    private static final long MIN_UPDATE_TIME = 1000 * 60 * 5;
-    private static final long MIN_UPDATE_DISTANCE= 500;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 500;
+    private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 5;
     private Forecast mForecast;
     private String provider;
     private LocationManager locationManager;
     private double latitude;
     private double longitude;
+    private String getLocality;
+    private boolean stormAlert = false;
+    private List<Address> addresses;
     private String locationForDaily;
     private int year_x;
     private int month_x;
@@ -70,10 +87,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean isDatePicked = false;
     private static final int DIALOG_ID = 0;
     private long mTimeMachineValue;
-    private String forecastUrl;
-    private String locale = Locale.getDefault().toString();
+    private Location location;
+    private String locale = Locale.getDefault().getLanguage();
+    private String localeUS = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private AnimationDrawable alertAnimation;
 
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
@@ -102,11 +120,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Bind(R.id.yearLabel)
     TextView mLocationLabel;
 
-    @Bind(R.id.precipLabel)
-    TextView mPrecipLabel;
 
     @Bind(R.id.timemachine)
     ImageView mTimeMachine;
+    @Bind(R.id.layoutBackground)
+    ImageView mImageviewLayout;
+
+    @Bind(R.id.alertImageView)
+    ImageView mAlertImage;
     // private SwipeRefreshLayout swipeLayout;
 
 
@@ -114,19 +135,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        final Calendar cal = Calendar.getInstance();
-        year_x = cal.get(Calendar.YEAR);
-        month_x = cal.get(Calendar.MONTH);
-        day_x = cal.get(Calendar.DAY_OF_MONTH);
 
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mAlertImage.setVisibility(View.INVISIBLE);
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
         getLocation();
-        getForecast(latitude, longitude);
-        getAddress(latitude, longitude);
+        if (latitude != 0 && longitude != 0) {
+            getAddress(latitude, longitude);
+            getForecast(latitude, longitude);
+
+
+        } else {
+            getLocation();
+            getAddress(latitude, longitude);
+            getForecast(latitude, longitude);
+        }
+
+
+        final Calendar cal = Calendar.getInstance();
+        year_x = cal.get(Calendar.YEAR);
+        month_x = cal.get(Calendar.MONTH);
+        day_x = cal.get(Calendar.DAY_OF_MONTH);
 
 
         mTimeMachine.setOnClickListener(new View.OnClickListener() {
@@ -142,14 +175,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onClick(View v) {
                 getLocation();
-                getForecast(latitude, longitude);
                 getAddress(latitude, longitude);
+                getForecast(latitude, longitude);
 
 
             }
         });
 
 
+    }
+
+    private void alertIconAnimation(ImageView img) {
+        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
+        img.startAnimation(animation);
+
+
+        img.setBackgroundResource(R.drawable.alertanimation);
+        alertAnimation = (AnimationDrawable) img.getBackground();
+        alertAnimation.start();
     }
 
 
@@ -165,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             year_x = year;
-            month_x = monthOfYear + 1;
+            month_x = monthOfYear;
             day_x = dayOfMonth;
             componentTimeToTimestamp(year_x, month_x, day_x);
 
@@ -174,9 +221,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             intent.putExtra("latitude", latitude);
             intent.putExtra("longitude", longitude);
             intent.putExtra("timeValue", mTimeMachineValue);
-            intent.putExtra("year",year_x);
-            intent.putExtra("month",month_x);
-            intent.putExtra("day",day_x);
+            intent.putExtra("year", year_x);
+            intent.putExtra("month", month_x);
+            intent.putExtra("day", day_x);
             intent.putExtra("location", locationForDaily);
             startActivity(intent);
 
@@ -185,29 +232,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     };
 
     private void getAddress(double latitude, double longitude) {
-        Geocoder gcd = new Geocoder(MainActivity.this, Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = gcd.getFromLocation(latitude,
-                    longitude, 1);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
-        if (addresses != null && addresses.size() > 0) {
-
-            mLocationLabel.setText(addresses.get(0).getLocality());
-
-            locationForDaily = (addresses.get(0).getLocality());
-            if (addresses.get(0).getLocality() == null) {
-
-                mLocationLabel.setText(addresses.get(0).getAdminArea());
-                locationForDaily = (addresses.get(0).getLocality());
+        GetAddressAsynctask addressAsynctask = new GetAddressAsynctask();
+        addressAsynctask.execute(latitude, longitude);
 
 
-            }
-        }
     }
 
     private void componentTimeToTimestamp(int year, int month, int day) {
@@ -227,69 +256,64 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void getForecast(double latitude, double longitude) {
         String apiKey = "6d73ebc175b9afd40c6e48e5700ca316";
 
-        String locale = Locale.getDefault().getLanguage().toString();
-        String locale2 = Locale.getDefault().toString();
-        if (locale.equals("sv")){
+
+        String forecastUrl;
+        if (locale.equals("sv")) {
 
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=sv&units=si&exclude=minutely,flags";
-        }else if(locale.equals("ar")){
+        } else if (locale.equals("ar")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=ar&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("bs")){
+        } else if (locale.equals("bs")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=bs&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("de")){
+        } else if (locale.equals("de")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=de&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("es")){
+        } else if (locale.equals("es")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=es&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("fr")){
+        } else if (locale.equals("fr")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=fr&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("it")){
+        } else if (locale.equals("it")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=it&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("nl")){
+        } else if (locale.equals("nl")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("pl")){
+        } else if (locale.equals("pl")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=pl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("pt")){
+        } else if (locale.equals("pt")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=pt&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("ru")){
+        } else if (locale.equals("ru")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=ru&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("sk")){
+        } else if (locale.equals("sk")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=sk&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("tet")){
+        } else if (locale.equals("tet")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=tet&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("tr")){
+        } else if (locale.equals("tr")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        }else if(locale.equals("zh")){
+        } else if (locale.equals("zh")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?lang=zh&units=auto&exclude=minutely,flags";
-        }else if(locale2.equals("en_US")){
+        } else if (localeUS.equals("en_US")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?exclude=minutely,flags";
-        }else if(locale2.equals("en_GB")){
+        } else if (localeUS.equals("en_GB")) {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?units=uk2&exclude=minutely,flags";
-        }
-
-
-
-        else{
+        } else {
             forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
                     "/" + latitude + "," + longitude + "?units=auto&exclude=minutely,flags";
         }
-
 
 
         if (isNetworkAvailable()) {
@@ -300,7 +324,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     .build();
 
             Call call = client.newCall(request);
+
             call.enqueue(new Callback() {
+
                 @Override
                 public void onFailure(Request request, IOException e) {
                     runOnUiThread(new Runnable() {
@@ -329,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 @Override
                                 public void run() {
                                     updateDisplay();
+
                                 }
                             });
 
@@ -359,47 +386,93 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void updateDisplay() {
         Current current = mForecast.getCurrent();
 
+
+        if (stormAlert) {
+            mAlertImage.setVisibility(View.VISIBLE);
+            alertIconAnimation(mAlertImage);
+        } else {
+            mAlertImage.setVisibility(View.INVISIBLE);
+        }
+        if (latitude == 0.0 && longitude == 0.0) {
+            mTemperatureLabel.setText("--");
+        }
         mTemperatureLabel.setText(current.getTemperature() + "");
         mTimeLabel.setText(current.getFormattedTime());
         mHumidityValue.setText(current.getHumidity() + "%");
         mPrecipValue.setText(current.getPrecipChance() + "%");
         mSummaryLabel.setText(current.getSummary());
-        @SuppressWarnings("deprecation") Drawable drawable = getResources().getDrawable(current.getIconId());
-        mIconImageView.setImageDrawable(drawable);
-        if (current.getPrecipChance() != 0) {
-            mPrecipLabel.setText(current.getPrecipType());
+
+
+        if (current.getSummary().equals("Regnskurar")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+        } else if (current.getSummary().equals("Duggregn")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+        }else if (current.getSummary().equals("Regn")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+        }else if (current.getSummary().equals("Skyfall")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+        } else if (current.getIcon().equals("clear-day")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+        }else if (current.getIcon().equals("partly-cloudy-day")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+        }else if (current.getIcon().equals("partly-cloudy-night")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+        }else if (current.getIcon().equals("clear-night")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+        }else if (current.getIcon().equals("cloudy")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+        }else if (current.getIcon().equals("fog")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+        }else if (current.getIcon().equals("snow")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
         }
-        if (latitude == 0.0 && longitude == 0.0) {
-            mTemperatureLabel.setText("--");
+
+
+
+
+    @SuppressWarnings("deprecation")
+    Drawable drawable = getResources().getDrawable(current.getIconId());
+    mIconImageView.setImageDrawable(drawable);
+
+
+    if(locale.equals("en_US"))
+
+    {
+        if (current.getTemperature() >= 77 && latitude != 0.0 && longitude != 0.0) {
+            YoYo.with(Techniques.Tada)
+                    .duration(700)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        } else if (current.getTemperature() <= 32) {
+            YoYo.with(Techniques.Shake)
+                    .duration(500)
+                    .playOn(findViewById(R.id.temperatureLabel));
         }
-
-
-
-        if(locale.equals("en_US")){
-            if (current.getTemperature() >= 77) {
-                YoYo.with(Techniques.Tada)
-                        .duration(700)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            } else if (current.getTemperature() <= 32) {
-                YoYo.with(Techniques.Shake)
-                        .duration(500)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            }
-        }else{
-            if (current.getTemperature() >= 25) {
-                YoYo.with(Techniques.Tada)
-                        .duration(700)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            } else if (current.getTemperature() <= 0) {
-                YoYo.with(Techniques.Shake)
-                        .duration(500)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            }
-        }
-
-
-
     }
+
+    else
+
+    {
+        String label = mTemperatureLabel.getText().toString();
+        if (current.getTemperature() >= 25 && label.equals("--")) {
+            YoYo.with(Techniques.Tada)
+                    .duration(700)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        } else if (current.getTemperature() <= 0) {
+            YoYo.with(Techniques.Shake)
+                    .duration(500)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        }
+    }
+
+
+}
 
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
@@ -432,6 +505,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             day.setTimezone(timezone);
             day.setWindSpeed(jsonDay.getDouble("windSpeed"));
             day.setWindBearing(jsonDay.getDouble("windBearing"));
+            day.setPrecipIntensityMax(jsonDay.getDouble("precipIntensityMax"));
+            day.setPrecipProbability(jsonDay.getDouble("precipProbability"));
+            if (jsonDay.has("precipType")) {
+                day.setPrecipType(jsonDay.getString("precipType"));
+            }
+
 
             days[i] = day;
 
@@ -471,21 +550,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         current.setHumidity(currently.getDouble("humidity"));
         current.setTime(currently.getLong("time"));
         current.setIcon(currently.getString("icon"));
+        if (currently.has("nearestStormDistance")) {
+            current.setNearestStormDistance(currently.getDouble("nearestStormDistance"));
+            current.setNearestStormBearing(currently.getDouble("nearestStormBearing"));
+
+            stormAlert = true;
+        } else {
+            stormAlert = false;
+        }
         current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
             current.setPrecipType(currently.getString("precipType"));
+            current.setPrecipIntensity(currently.getDouble("precipIntensity"));
         }
+
         current.setSummary(currently.getString("summary"));
         current.setTemperature(currently.getDouble("temperature"));
         current.setTimeZone(timezone);
-
-
 
 
         return current;
 
 
     }
+
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -516,20 +604,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the locatioin provider -> use
         // default
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
-
-        provider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(provider);
 
 
-        if (location != null) {
-            System.out.println("Provider " + provider + " has been selected.");
-            onLocationChanged(location);
+        if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+
+            builder.setTitle(R.string.location_dialog_title)
+                    .setMessage(R.string.location_dialog_message)
+                    .setNegativeButton(R.string.close_app_button_title, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            paramDialogInterface.dismiss();
+
+                        }
+                    })
+                    .setPositiveButton(R.string.location_dialog_positive_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+
+                            startActivity(myIntent);
+                        }
+                    });
+
+            android.app.AlertDialog dialog = builder.create();
+
+
+            dialog.show();
+
+        } else {
+            GetLocationAsyncTask locationAsyncTask = new GetLocationAsyncTask();
+            locationAsyncTask.execute();
         }
 
 
@@ -538,8 +645,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onResume() {
         super.onResume();
-        locationManager.requestLocationUpdates(provider, MIN_UPDATE_TIME, MIN_UPDATE_DISTANCE, this);
-        getLocation();
+        if (provider.isEmpty()) {
+            getLocation();
+        }
+        locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
 
     }
@@ -552,6 +661,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
+
+        // latitude = 37.8267;
+      //  longitude =-122.423;
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         getForecast(latitude, longitude);
@@ -593,6 +705,188 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivity(intent);
     }
 
+    @OnClick(R.id.alertImageView)
+    public void openAlertActivity(View view) {
+        Current current = mForecast.getCurrent();
+
+        float toDegrees = (float) current.getNearestStormBearing();
+        int distanceStorm = (int) Math.round(current.getNearestStormDistance());
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog_alert, null);
+
+        builder.setView(layout);
+
+
+        ImageView arrow = (ImageView) layout.findViewById(R.id.alertDialogArrow);
+        TextView distance = (TextView) layout.findViewById(R.id.distanceToStormTextView);
+
+        if (localeUS.equals("en_US")) {
+            distance.setText(distanceStorm + " miles away");
+        } else {
+            distance.setText(distanceStorm + getString(R.string.alert_dialog_km_away));
+        }
+
+
+        Animation ani = new RotateAnimation(
+                0, /* from degree*/
+                toDegrees, /* to degree */
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        ani.setDuration(1000);
+        ani.setFillAfter(true);
+        arrow.startAnimation(ani);
+
+        Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
+
+
+        final AlertDialog dialog = builder.create();
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.show();
+
+
+    }
+
+
+    @OnClick(R.id.precipLayout)
+    public void openPrecipDialog(View view) {
+        Current current = mForecast.getCurrent();
+        if (current.getPrecipChance() != 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog, null);
+
+            builder.setView(layout);
+
+
+            TextView title = (TextView) layout.findViewById(R.id.pickedDayTextView);
+            TextView message = (TextView) layout.findViewById(R.id.contentAlertDIalogTextView);
+            ImageView icon = (ImageView) layout.findViewById(R.id.iconImageViewAlert);
+            ImageView precipIcon = (ImageView) layout.findViewById(R.id.precipIntensityMaxIcon);
+            Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
+            LinearLayout icon3 = (LinearLayout) layout.findViewById(R.id.linearlayout132);
+            TextView precipIntenstity = (TextView) layout.findViewById(R.id.precipIntensityMaxTextView);
+
+            icon3.setVisibility(View.GONE);
+
+            if (current.getPrecipType().equals("snow")) {
+                precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.snowflaje));
+            } else if (current.getPrecipType().equals("rain")) {
+                precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.water));
+            }
+            title.setText(R.string.precip_dialog_title);
+            DecimalFormat form = new DecimalFormat("0.00");
+            if (localeUS.equals("en_US")) {
+                precipIntenstity.setText(form.format(current.getPrecipIntensity()) + " inches per hour");
+            } else {
+                precipIntenstity.setText(form.format(current.getPrecipIntensity()) + getString(R.string.precip_dialog_message2));
+            }
+
+
+            final AlertDialog dialog = builder.create();
+            okButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+
+
+            dialog.show();
+
+        }
+
+    }
+
+
+private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
+
+    @Override
+    protected Void doInBackground(Object... location) {
+
+        double latitude = (Double) location[0];
+        double longitude = (Double) location[1];
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+        addresses = null;
+        try {
+            addresses = gcd.getFromLocation(latitude,
+                    longitude, 1);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        if (addresses != null && addresses.size() > 0) {
+
+            if ((addresses.get(0).getLocality() != null)) {
+
+                getLocality = addresses.get(0).getLocality();
+                locationForDaily = getLocality;
+            } else {
+                getLocality = addresses.get(0).getAddressLine(0);
+                locationForDaily = getLocality;
+            }
+
+
+        }
+
+        return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+        mLocationLabel.setText(getLocality);
+
+
+    }
+
+}
+
+private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void> {
+
+    @Override
+    protected Void doInBackground(Object... params) {
+
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+
+        provider = locationManager.getBestProvider(criteria, true);
+
+        location = locationManager.getLastKnownLocation(provider);
+
+
+        return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+
+        if (location != null) {
+            System.out.println("Provider " + provider + " has been selected.");
+            onLocationChanged(location);
+        }
+    }
+}
 
 }
 

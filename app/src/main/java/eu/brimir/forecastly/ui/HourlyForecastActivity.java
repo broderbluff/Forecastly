@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -65,6 +66,12 @@ public class HourlyForecastActivity extends ListActivity {
         TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
         ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
         Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+        LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
+        LinearLayout icon2 = (LinearLayout)layout.findViewById(R.id.linearLayout5);
+
+        icon3.setVisibility(View.GONE);
+        icon2.setVisibility(View.GONE);
+
         title.setText(pickedHour);
         message.setText(getString(R.string.the_temp_will_text) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will) + conditions);
         icon.setImageResource(iconId);

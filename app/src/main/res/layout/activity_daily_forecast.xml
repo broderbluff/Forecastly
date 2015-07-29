@@ -2,11 +2,12 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+
 
                 tools:context="eu.brimir.forecastly.ui.DailyForecastActivity"
-                android:background="@drawable/bg_gradient"
+                android:background="#F2455A64"
                 android:gravity="center">
 
     <ListView

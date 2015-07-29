@@ -1,5 +1,6 @@
 package eu.brimir.forecastly.weather;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -72,7 +73,7 @@ public class Hourly implements Parcelable {
     }
 
     public String getHour(){
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         Date date = new Date(mTime * 1000);
         return formatter.format(date);
     }

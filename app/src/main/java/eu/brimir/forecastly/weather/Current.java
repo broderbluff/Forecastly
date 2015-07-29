@@ -1,5 +1,7 @@
 package eu.brimir.forecastly.weather;
 
+import android.annotation.SuppressLint;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -17,7 +19,37 @@ public class Current {
     private String mPrecipType;
     private String mSummary;
     private String mTimeZone;
-    private String locale = Locale.getDefault().getLanguage().toString();
+    private double mPrecipIntensity;
+    private double mNearestStormDistance;
+    private double mNearestStormBearing;
+
+
+    public double getPrecipIntensity() {
+
+        return mPrecipIntensity;
+    }
+
+    public void setPrecipIntensity(double precipIntensity) {
+        mPrecipIntensity = precipIntensity;
+    }
+
+    public double getNearestStormDistance() {
+        return mNearestStormDistance;
+    }
+
+    public void setNearestStormDistance(double nearestStormDistance) {
+        mNearestStormDistance = nearestStormDistance;
+    }
+
+    public double getNearestStormBearing() {
+        return mNearestStormBearing;
+    }
+
+    public void setNearestStormBearing(double nearestStormBearing) {
+        mNearestStormBearing = nearestStormBearing;
+    }
+
+    private String locale = Locale.getDefault().getLanguage();
 
     public String getTimeZone() {
         return mTimeZone;
@@ -46,9 +78,9 @@ public class Current {
 
 
     public String getFormattedTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat formatterDay = new SimpleDateFormat("ccc" + " d/MM");
-        SimpleDateFormat formatterWeek = new SimpleDateFormat("w");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterDay = new SimpleDateFormat("ccc" + " d/MM");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterWeek = new SimpleDateFormat("w");
         formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);
@@ -103,100 +135,107 @@ public class Current {
 
     public String getPrecipType() {
 
-        if (locale.equals("sv")) {
-            switch (mPrecipType) {
-                case "rain":
+        switch (locale) {
+            case "sv":
+                switch (mPrecipType) {
+                    case "rain":
 
-                    return "Risk för regn";
-                case "snow":
-                    return "Risk för snöfall";
-                case "sleet":
-                    return "Risk för snöblandat regn";
-                case "hail":
-                    return "Risk för hagel";
-            }
-        } else if (locale.equals("ar")) {
-            switch (mPrecipType) {
-                case "rain":
+                        return "Risk för regn";
+                    case "snow":
+                        return "Risk för snöfall";
+                    case "sleet":
+                        return "Risk för snöblandat regn";
+                    case "hail":
+                        return "Risk för hagel";
+                }
+                break;
+            case "ar":
+                switch (mPrecipType) {
+                    case "rain":
 
-                    return "فرصة للمطر";
-                case "snow":
-                    return "فرصة للثلج";
-                case "sleet":
-                    return "فرصة من الصقيع";
-                case "hail":
-                    return "فرصة من البرد";
-            }
+                        return "فرصة للمطر";
+                    case "snow":
+                        return "فرصة للثلج";
+                    case "sleet":
+                        return "فرصة من الصقيع";
+                    case "hail":
+                        return "فرصة من البرد";
+                }
 
-        }else if (locale.equals("bs")) {
-            switch (mPrecipType) {
-                case "rain":
+                break;
+            case "bs":
+                switch (mPrecipType) {
+                    case "rain":
 
-                    return "Moguća kiša";
-                case "snow":
-                    return "Mogući snijeg";
-                case "sleet":
-                    return "Moguća susnježica";
-                case "hail":
-                    return "Moguća grad";
-            }
-        }else if (locale.equals("de")) {
-            switch (mPrecipType) {
-                case "rain":
-                    return "Vereinzelt regen";
+                        return "Moguća kiša";
+                    case "snow":
+                        return "Mogući snijeg";
+                    case "sleet":
+                        return "Moguća susnježica";
+                    case "hail":
+                        return "Moguća grad";
+                }
+                break;
+            case "de":
+                switch (mPrecipType) {
+                    case "rain":
+                        return "Vereinzelt regen";
 
-                case "snow":
-                    return "Vereinzelt Schnee";
+                    case "snow":
+                        return "Vereinzelt Schnee";
 
-                case "sleet":
-                    return "Vereinzelt Schneeregen";
+                    case "sleet":
+                        return "Vereinzelt Schneeregen";
 
-                case "hail":
-                    return "Vereinzelt Hagel";
-            }
-        }else if (locale.equals("en")) {
-            switch (mPrecipType) {
-                case "rain":
-                    return "Chance of rain";
+                    case "hail":
+                        return "Vereinzelt Hagel";
+                }
+                break;
+            case "en":
+                switch (mPrecipType) {
+                    case "rain":
+                        return "Chance of rain";
 
-                case "snow":
-                    return "Chance of snow";
+                    case "snow":
+                        return "Chance of snow";
 
-                case "sleet":
-                    return "Chance of sleet";
+                    case "sleet":
+                        return "Chance of sleet";
 
-                case "hail":
-                    return "Chance of hail";
-            }
-        }else if (locale.equals("es")) {
-            switch (mPrecipType) {
-                case "rain":
-                    return "Probabilidad de lluvia";
+                    case "hail":
+                        return "Chance of hail";
+                }
+                break;
+            case "es":
+                switch (mPrecipType) {
+                    case "rain":
+                        return "Probabilidad de lluvia";
 
-                case "snow":
-                    return "Probabilidad de lluvia";
+                    case "snow":
+                        return "Probabilidad de lluvia";
 
-                case "sleet":
-                    return "Posibilidad de aguanieve";
+                    case "sleet":
+                        return "Posibilidad de aguanieve";
 
-                case "hail":
-                    return "Probabilidad de lluvia";
-            }
-        }
-        else if (locale.equals("fr")) {
-            switch (mPrecipType) {
-                case "rain":
-                    return "Risque de pluie";
+                    case "hail":
+                        return "Probabilidad de lluvia";
+                }
+                break;
+            case "fr":
+                switch (mPrecipType) {
+                    case "rain":
+                        return "Risque de pluie";
 
-                case "snow":
-                    return "Risque de neige";
+                    case "snow":
+                        return "Risque de neige";
 
-                case "sleet":
-                    return "Risque de verglas";
+                    case "sleet":
+                        return "Risque de verglas";
 
-                case "hail":
-                    return "Risque de grêle";
-            }
+                    case "hail":
+                        return "Risque de grêle";
+                }
+                break;
         }
 
         return mPrecipType;

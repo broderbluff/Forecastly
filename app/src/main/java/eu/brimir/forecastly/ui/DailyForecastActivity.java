@@ -8,11 +8,16 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import butterknife.Bind;
@@ -57,11 +62,21 @@ public class DailyForecastActivity extends ListActivity {
         String dayOfTheWeek = mDays[position].getDayOfTheWeek();
         String conditions = mDays[position].getSummary();
         String highTemp = mDays[position].getTemperatureMax() + "";
+        String precipProbability = mDays[position].getPrecipProbability() + "";
+        String precipType = "";
+        String precipIntensityMax = String.format("%.2f", mDays[position].getPrecipIntensityMax());
+        if ( mDays[position].getPrecipProbability() != 0){
+
+            precipType = mDays[position].getPrecipType();
+        }
+
         int iconId = mDays[position].getIconId();
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater=DailyForecastActivity.this.getLayoutInflater();
         @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+
 
         builder.setView(layout);
 
@@ -70,8 +85,33 @@ public class DailyForecastActivity extends ListActivity {
         TextView message = (TextView)layout.findViewById(R.id.contentAlertDIalogTextView);
         ImageView icon = (ImageView)layout.findViewById(R.id.iconImageViewAlert);
         Button okButton = (Button)layout.findViewById(R.id.alertDialogButton);
+        TextView precip = (TextView)layout.findViewById(R.id.precipChanceDialogTextView);
+        TextView precipIntenstity = (TextView)layout.findViewById(R.id.precipIntensityMaxTextView);
         title.setText(dayOfTheWeek);
-        message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will) + conditions);
+
+        if(precipType.isEmpty()){
+            message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will)
+                    + conditions);
+            LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
+            LinearLayout icon2 = (LinearLayout)layout.findViewById(R.id.linearLayout5);
+
+            icon3.setVisibility(View.GONE);
+            icon2.setVisibility(View.GONE);
+
+        }else{
+
+
+            message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will)
+                    + conditions+ "\n" );
+
+            precip.setText(precipProbability + "%" + " " + precipType);
+            precipIntenstity.setText(precipIntensityMax + getString(R.string.daily_mmanhour));
+
+
+        }
+
+
+
         icon.setImageResource(iconId);
         final AlertDialog dialog = builder.create();
         okButton.setOnClickListener(new View.OnClickListener() {
