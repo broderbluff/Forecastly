@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -61,8 +62,13 @@ public class DailyForecastActivity extends ListActivity {
         String conditions = mDays[position].getSummary();
         String highTemp = mDays[position].getTemperatureMax() + "";
         String precipProbability = mDays[position].getPrecipProbability() + "";
+        String precipType = "";
         String precipIntensityMax = String.format("%.2f", mDays[position].getPrecipIntensityMax());
-        String precipType = mDays[position].getPrecipType();
+        if ( mDays[position].getPrecipProbability() != 0){
+
+            precipType = mDays[position].getPrecipType();
+        }
+
         int iconId = mDays[position].getIconId();
 
 
@@ -84,6 +90,11 @@ public class DailyForecastActivity extends ListActivity {
         if(precipType.isEmpty()){
             message.setText(getString(R.string.will_the_temp) + highTemp + getString(R.string.degrees_Text) + "\n" + "\n" + getString(R.string.and_it_will)
                     + conditions);
+            LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
+            LinearLayout icon2 = (LinearLayout)layout.findViewById(R.id.linearLayout5);
+
+            icon3.setVisibility(View.GONE);
+            icon2.setVisibility(View.GONE);
 
         }else{
 

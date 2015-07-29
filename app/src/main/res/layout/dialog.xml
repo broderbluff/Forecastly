@@ -106,7 +106,7 @@
                 android:id="@+id/precipIntensityMaxTextView"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
-                android:layout_weight="0.36"/>
+              />
         </LinearLayout>
 
 
@@ -127,6 +127,7 @@
             android:id="@+id/alertDialogButton"
             android:text="@string/ok_button"
             android:background="#455A64"
+            style="?android:attr/buttonBarButtonStyle"
             android:textColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

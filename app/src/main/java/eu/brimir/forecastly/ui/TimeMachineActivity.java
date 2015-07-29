@@ -3,6 +3,7 @@ package eu.brimir.forecastly.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -65,6 +66,8 @@ public class TimeMachineActivity extends AppCompatActivity {
 
     @Bind(R.id.locationLabelTimeMachine)
     TextView mLocationLabel;
+    @Bind(R.id.layoutBackground)
+    ImageView mImageViewLayout;
 
 
     @Override
@@ -262,6 +265,34 @@ public class TimeMachineActivity extends AppCompatActivity {
         mYearLabel.setText(timeMachine.getFormattedYear());
         Drawable drawable = getResources().getDrawable(timeMachine.getIconId());
         mIconImageView.setImageDrawable(drawable);
+
+
+        if (timeMachine.getSummary().equals("Regnskurar")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+        } else if (timeMachine.getSummary().equals("Duggregn")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+        } else if (timeMachine.getIcon().equals("clear-day")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("partly-cloudy-day")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("partly-cloudy-night")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("clear-night")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("cloudy")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("fog")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+        }else if (timeMachine.getIcon().equals("snow")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+        }
 
         if (latitude == 0.0 && longitude == 0.0) {
             mTemperatureLabel.setText(R.string.no_temp);

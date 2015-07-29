@@ -1,5 +1,7 @@
 package eu.brimir.forecastly.weather;
 
+import android.annotation.SuppressLint;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -45,7 +47,7 @@ public class TimeMachine {
 
     public String getFormattedDay() {
 
-        SimpleDateFormat formatterDay = new SimpleDateFormat("d" + " LLLL");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterDay = new SimpleDateFormat("d" + " LLLL");
 
         formatterDay.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);
@@ -54,7 +56,7 @@ public class TimeMachine {
     }
     public String getFormattedYear() {
 
-        SimpleDateFormat formatterYear = new SimpleDateFormat("yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterYear = new SimpleDateFormat("yyyy");
 
         formatterYear.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);

@@ -87,6 +87,7 @@
             android:background="#455A64"
             android:textColor="@android:color/white"
             android:layout_width="match_parent"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_height="wrap_content"
             android:singleLine="true"/>
 

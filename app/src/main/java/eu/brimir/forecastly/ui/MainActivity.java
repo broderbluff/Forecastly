@@ -400,60 +400,79 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mTimeLabel.setText(current.getFormattedTime());
         mHumidityValue.setText(current.getHumidity() + "%");
         mPrecipValue.setText(current.getPrecipChance() + "%");
-
-        switch (current.getIcon()) {
-            case "rain":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_bg));
-                break;
-            case "clear-day":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_bg));
-                break;
-            case "partly-cloudy-day":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day));
-                break;
-            case "partly-cloudy-night":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_bg));
-                break;
-            case "clear-night":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_bg));
-                break;
-            case "cloudy":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.overcast));
-                break;
-            case "fog":
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_bg));
-                break;
-        }
         mSummaryLabel.setText(current.getSummary());
-        @SuppressWarnings("deprecation") Drawable drawable = getResources().getDrawable(current.getIconId());
-        mIconImageView.setImageDrawable(drawable);
 
 
-        if (locale.equals("en_US")) {
-            if (current.getTemperature() >= 77 && latitude != 0.0 && longitude != 0.0) {
-                YoYo.with(Techniques.Tada)
-                        .duration(700)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            } else if (current.getTemperature() <= 32) {
-                YoYo.with(Techniques.Shake)
-                        .duration(500)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            }
-        } else {
-            String label = mTemperatureLabel.getText().toString();
-            if (current.getTemperature() >= 25 && label.equals("--")) {
-                YoYo.with(Techniques.Tada)
-                        .duration(700)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            } else if (current.getTemperature() <= 0) {
-                YoYo.with(Techniques.Shake)
-                        .duration(500)
-                        .playOn(findViewById(R.id.temperatureLabel));
-            }
+        if (current.getSummary().equals("Regnskurar")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+        } else if (current.getSummary().equals("Duggregn")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+        }else if (current.getSummary().equals("Regn")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+        }else if (current.getSummary().equals("Skyfall")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+        } else if (current.getIcon().equals("clear-day")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+        }else if (current.getIcon().equals("partly-cloudy-day")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+        }else if (current.getIcon().equals("partly-cloudy-night")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+        }else if (current.getIcon().equals("clear-night")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+        }else if (current.getIcon().equals("cloudy")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+        }else if (current.getIcon().equals("fog")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+        }else if (current.getIcon().equals("snow")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
         }
 
 
+
+
+    @SuppressWarnings("deprecation")
+    Drawable drawable = getResources().getDrawable(current.getIconId());
+    mIconImageView.setImageDrawable(drawable);
+
+
+    if(locale.equals("en_US"))
+
+    {
+        if (current.getTemperature() >= 77 && latitude != 0.0 && longitude != 0.0) {
+            YoYo.with(Techniques.Tada)
+                    .duration(700)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        } else if (current.getTemperature() <= 32) {
+            YoYo.with(Techniques.Shake)
+                    .duration(500)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        }
     }
+
+    else
+
+    {
+        String label = mTemperatureLabel.getText().toString();
+        if (current.getTemperature() >= 25 && label.equals("--")) {
+            YoYo.with(Techniques.Tada)
+                    .duration(700)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        } else if (current.getTemperature() <= 0) {
+            YoYo.with(Techniques.Shake)
+                    .duration(500)
+                    .playOn(findViewById(R.id.temperatureLabel));
+        }
+    }
+
+
+}
 
 
     private Forecast parseForecastDetails(String jsonData) throws JSONException {
@@ -536,8 +555,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             current.setNearestStormBearing(currently.getDouble("nearestStormBearing"));
 
             stormAlert = true;
-        }else{
-            stormAlert =false;
+        } else {
+            stormAlert = false;
         }
         current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
@@ -643,8 +662,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onLocationChanged(Location location) {
 
-       // latitude = 1.8175;
-       // longitude =16.4857;
+        // latitude = 37.8267;
+      //  longitude =-122.423;
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         getForecast(latitude, longitude);
@@ -753,20 +772,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             ImageView icon = (ImageView) layout.findViewById(R.id.iconImageViewAlert);
             ImageView precipIcon = (ImageView) layout.findViewById(R.id.precipIntensityMaxIcon);
             Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
-            LinearLayout icon3 = (LinearLayout)layout.findViewById(R.id.linearlayout132);
-            TextView precipIntenstity = (TextView)layout.findViewById(R.id.precipIntensityMaxTextView);
+            LinearLayout icon3 = (LinearLayout) layout.findViewById(R.id.linearlayout132);
+            TextView precipIntenstity = (TextView) layout.findViewById(R.id.precipIntensityMaxTextView);
 
             icon3.setVisibility(View.GONE);
 
-            if(current.getPrecipType().equals("snow")){
+            if (current.getPrecipType().equals("snow")) {
                 precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.snowflaje));
-            }else if (current.getPrecipType().equals("rain")){
+            } else if (current.getPrecipType().equals("rain")) {
                 precipIcon.setImageDrawable(getResources().getDrawable(R.drawable.water));
             }
             title.setText(R.string.precip_dialog_title);
             DecimalFormat form = new DecimalFormat("0.00");
             if (localeUS.equals("en_US")) {
-               precipIntenstity.setText(form.format(current.getPrecipIntensity()) + " inches per hour");
+                precipIntenstity.setText(form.format(current.getPrecipIntensity()) + " inches per hour");
             } else {
                 precipIntenstity.setText(form.format(current.getPrecipIntensity()) + getString(R.string.precip_dialog_message2));
             }
@@ -788,86 +807,86 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
 
-    private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
+private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
 
-        @Override
-        protected Void doInBackground(Object... location) {
+    @Override
+    protected Void doInBackground(Object... location) {
 
-            double latitude = (Double) location[0];
-            double longitude = (Double) location[1];
-            Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+        double latitude = (Double) location[0];
+        double longitude = (Double) location[1];
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
 
-            addresses = null;
-            try {
-                addresses = gcd.getFromLocation(latitude,
-                        longitude, 1);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-
-            if (addresses != null && addresses.size() > 0) {
-
-                if ((addresses.get(0).getLocality() != null)) {
-
-                    getLocality = addresses.get(0).getLocality();
-                    locationForDaily = getLocality;
-                } else {
-                    getLocality = addresses.get(0).getAddressLine(0);
-                    locationForDaily = getLocality;
-                }
-
-
-            }
-
-            return null;
+        addresses = null;
+        try {
+            addresses = gcd.getFromLocation(latitude,
+                    longitude, 1);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        if (addresses != null && addresses.size() > 0) {
 
-            mLocationLabel.setText(getLocality);
+            if ((addresses.get(0).getLocality() != null)) {
+
+                getLocality = addresses.get(0).getLocality();
+                locationForDaily = getLocality;
+            } else {
+                getLocality = addresses.get(0).getAddressLine(0);
+                locationForDaily = getLocality;
+            }
 
 
         }
+
+        return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+        mLocationLabel.setText(getLocality);
+
 
     }
 
-    private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void> {
+}
 
-        @Override
-        protected Void doInBackground(Object... params) {
+private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void> {
 
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setAltitudeRequired(false);
-            criteria.setBearingRequired(false);
-            criteria.setCostAllowed(true);
-            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+    @Override
+    protected Void doInBackground(Object... params) {
 
-            provider = locationManager.getBestProvider(criteria, true);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
 
-            location = locationManager.getLastKnownLocation(provider);
+        provider = locationManager.getBestProvider(criteria, true);
 
-
-            return null;
-        }
+        location = locationManager.getLastKnownLocation(provider);
 
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        return null;
+    }
 
 
-            if (location != null) {
-                System.out.println("Provider " + provider + " has been selected.");
-                onLocationChanged(location);
-            }
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+
+        if (location != null) {
+            System.out.println("Provider " + provider + " has been selected.");
+            onLocationChanged(location);
         }
     }
+}
 
 }
 

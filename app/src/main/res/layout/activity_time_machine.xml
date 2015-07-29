@@ -5,8 +5,13 @@
                 android:layout_height="match_parent"
                 android:id="@+id/timemachinemainlayout"
                 tools:context="eu.brimir.forecastly.ui.TimeMachineActivity"
-                android:background="#ff607d8b">
-
+                >
+    <ImageView
+        android:id="@+id/layoutBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_gradient"/>
 
     <RelativeLayout
         android:layout_above="@+id/footer"
@@ -15,7 +20,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
 
-        android:background="@drawable/bg_gradient">
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -75,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/iconImageView"
-                android:src="@drawable/cloudy_night"
+
                 android:layout_alignTop="@+id/summaryLabel"
                 android:layout_toLeftOf="@+id/summaryLabel"
                 android:layout_toStartOf="@+id/summaryLabel"

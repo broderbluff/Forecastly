@@ -1,5 +1,7 @@
 package eu.brimir.forecastly.weather;
 
+import android.annotation.SuppressLint;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -76,9 +78,9 @@ public class Current {
 
 
     public String getFormattedTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat formatterDay = new SimpleDateFormat("ccc" + " d/MM");
-        SimpleDateFormat formatterWeek = new SimpleDateFormat("w");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterDay = new SimpleDateFormat("ccc" + " d/MM");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatterWeek = new SimpleDateFormat("w");
         formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);

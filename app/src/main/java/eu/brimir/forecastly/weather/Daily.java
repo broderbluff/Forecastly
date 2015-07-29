@@ -1,5 +1,6 @@
 package eu.brimir.forecastly.weather;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -238,7 +239,7 @@ public int getIconId(){
 }
 
     public String getDayOfTheWeek(){
-        SimpleDateFormat formatter = new SimpleDateFormat("cccc");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("cccc");
         formatter.setTimeZone(TimeZone.getTimeZone(mTimezone));
 
         Date dateTime = new Date(mTime *1000);
