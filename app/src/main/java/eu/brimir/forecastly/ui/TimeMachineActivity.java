@@ -268,9 +268,13 @@ public class TimeMachineActivity extends AppCompatActivity {
 
 
         if (timeMachine.getSummary().equals("Regnskurar")) {
-            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
         } else if (timeMachine.getSummary().equals("Duggregn")) {
             mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+        }else if (timeMachine.getSummary().equals("Regn")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+        }else if (timeMachine.getSummary().equals("Skyfall")) {
+            mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
         } else if (timeMachine.getIcon().equals("clear-day")) {
             mImageViewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 

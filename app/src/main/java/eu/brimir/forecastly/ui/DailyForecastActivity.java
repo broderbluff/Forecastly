@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,6 +76,7 @@ public class DailyForecastActivity extends ListActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater=DailyForecastActivity.this.getLayoutInflater();
         @SuppressLint("InflateParams") View layout=inflater.inflate(R.layout.dialog,null);
+
 
         builder.setView(layout);
 

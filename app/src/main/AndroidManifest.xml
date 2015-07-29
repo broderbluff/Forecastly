@@ -28,7 +28,8 @@
             android:name=".ui.DailyForecastActivity"
             android:label="@string/title_activity_daily_forecast"
             android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Transparent">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.brimir.forecastly.ui.MainActivity" />
@@ -37,7 +38,8 @@
             android:name=".ui.HourlyForecastActivity"
             android:label="@string/title_activity_hourly_forecast"
             android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Transparent">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.brimir.forecastly.ui.MainActivity" />
@@ -46,7 +48,8 @@
             android:name=".ui.TimeMachineActivity"
             android:label="@string/title_activity_time_machine"
             android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.brimir.forecastly.ui.MainActivity" />

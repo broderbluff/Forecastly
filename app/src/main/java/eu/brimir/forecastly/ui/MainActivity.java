@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }else if (current.getSummary().equals("Regn")) {
             mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
         }else if (current.getSummary().equals("Skyfall")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
         } else if (current.getIcon().equals("clear-day")) {
             mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
