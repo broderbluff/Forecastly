@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forecastly</string>
+    <string name="alert_dialog_alert_title">Alerta de Tempestade!</string>
+    <string name="alert_dialog_km_away">" km"</string>
+    <string name="and_it_will">"Haverá "</string>
+    <string name="close_app_button_title">fechar</string>
+    <string name="daily_mmanhour">mm uma hora</string>
+    <string name="daily_upto">"Até "</string>
+    <string name="degrees_Text">" graus."</string>
+    <string name="dialog_alert_title">tempestade de aproximação</string>
+    <string name="error_message">Havia um erro. Por favor, tente novamente.</string>
+    <string name="error_title">Ops! Desculpe!</string>
+    <string name="forecastio">Distribuído por Forecast</string>
+    <string name="getting_weather_data">Obtendo os dados do tempo ....</string>
+    <string name="hail">Possibilidade de granizo</string>
+    <string name="hour_by_hour">De hora em hora</string>
+    <string name="hour_label">De hora em hora</string>
+    <string name="humidity">Umidade</string>
+    <string name="location_dialog_message">Serviços de localização está desligado, este aplicativo requer para saber a sua localização para obter os dados meteorológicos corretos. \ N \ nApós permitindo que os Serviços de Localização, pode levar alguns segundos antes do tempo correto está mostrando</string>
+    <string name="location_dialog_positive_button">Configurações do local Abertas</string>
+    <string name="location_dialog_title">Serviços de localização não disponíveis</string>
+    <string name="no_daily_forecast_data">Não há dados meteorológicos disponíveis</string>
+    <string name="no_network_toast">Rede não está disponível!</string>
+    <string name="ok_button">OK</string>
+    <string name="precip_dialog_message1">"Até "</string>
+    <string name="on_text">"Em "</string>
+    <string name="precip_dialog_message2">"mm por hora"</string>
+    <string name="precip_dialog_title">Precipitação esperado</string>
+    <string name="precip_label">Precipitação?</string>
+    <string name="rain">Chance de chover</string>
+    <string name="seven_days">7 Dias</string>
+    <string name="sleet">Possibilidade de granizo</string>
+    <string name="snow">Possibilidade de neve</string>
+    <string name="the_temp_will_text">"A temperatura será "</string>
+    <string name="the_weather_was_label">a temperatura do dia seleccionado.</string>
+    <string name="time_text">"Às "</string>
+    <string name="today">Hoje</string>
+    <string name="week">Semana</string>
+    <string name="weeks_weather_label">Tempo para a semana</string>
+    <string name="will_the_temp">"A temperatura mais alta será "</string>
+</resources>
