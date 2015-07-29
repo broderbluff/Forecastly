@@ -405,47 +405,80 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mPrecipValue.setText(current.getPrecipChance() + "%");
         mSummaryLabel.setText(current.getSummary());
 
+if(locale.equals("sv")){
+    if (current.getSummary().equals("Regnskurar")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
 
-        if (current.getSummary().equals("Regnskurar")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+    } else if (current.getSummary().equals("Duggregn")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
 
-        } else if (current.getSummary().equals("Duggregn")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+    } else if (current.getSummary().equals("Regn")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
 
-        } else if (current.getSummary().equals("Regn")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+    } else if (current.getSummary().equals("Skyfall")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
 
-        } else if (current.getSummary().equals("Skyfall")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+    } else if (current.getIcon().equals("clear-day")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-        } else if (current.getIcon().equals("clear-day")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+    } else if (current.getSummary().equals("Lätt molnighet")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
-        } else if (current.getSummary().equals("Lätt molnighet")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+    } else if (current.getSummary().equals("Molnigt")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
 
-        } else if (current.getSummary().equals("Molnigt")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+    } else if (current.getIcon().equals("partly-cloudy-night")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
 
-        } else if (current.getIcon().equals("partly-cloudy-night")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+    } else if (current.getIcon().equals("clear-night")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
 
-        } else if (current.getIcon().equals("clear-night")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+    } else if (current.getIcon().equals("cloudy")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
 
-        } else if (current.getIcon().equals("cloudy")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+    } else if (current.getIcon().equals("fog")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
 
-        } else if (current.getIcon().equals("fog")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+    } else if (current.getIcon().equals("snow")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
 
-        } else if (current.getIcon().equals("snow")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+    } else if (current.getIcon().equals("wind")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
-        } else if (current.getIcon().equals("wind")) {
-            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+    }
+}else{
+    if (current.getIcon().equals("rain")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
 
-        }
+
+
+    } else if (current.getIcon().equals("clear-day")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+    } else if (current.getIcon().equals("partly-cloudy-day")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+    }  else if (current.getIcon().equals("partly-cloudy-night")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+    } else if (current.getIcon().equals("clear-night")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+    } else if (current.getIcon().equals("cloudy")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+    } else if (current.getIcon().equals("fog")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+    } else if (current.getIcon().equals("snow")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+    } else if (current.getIcon().equals("wind")) {
+        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+
+    }
+}
+
 
 
         @SuppressWarnings("deprecation")

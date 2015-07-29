@@ -1,48 +1,65 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    android:paddingLeft="16dp"
 
-                android:background="#80000000"
-                tools:context="eu.brimir.forecastly.ui.HourlyForecastActivity"
-  >
+    android:paddingRight="16dp"
+    tools:context="eu.brimir.forecastly.ui.HourlyForecastActivity">
 
 
     <TextView
+        android:id="@+id/thisHourLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hour_by_hour"
-        android:id="@+id/thisHourLabel"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="@string/hour_by_hour"
         android:textColor="@android:color/white"
-        android:textSize="30sp"
-        android:layout_marginTop="16dp"/>
+        android:textSize="30sp" />
+
     <ListView
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@android:id/list"
+        android:layout_above="@+id/footer"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/thisHourLabel"
-        android:scrollbars="none"
-        android:layout_above="@+id/locationLabelHourly"
+        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:layout_marginBottom="8dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/not_available"
-        android:id="@+id/locationLabelHourly"
+        android:scrollbars="none" />
+
+    <LinearLayout
+        android:id="@+id/footer"
+
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#80000000"
+        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true">
+
+        <Button
+            android:id="@+id/hourlyOkButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/ok_button"
+            android:textColor="@android:color/white"
+
+            />
+
+
+    </LinearLayout>
 
 
 </RelativeLayout>

@@ -29,8 +29,7 @@ import eu.brimir.forecastly.weather.Hourly;
 
 public class HourlyForecastActivity extends ListActivity {
     private Hourly[] mHours;
-    @Bind(R.id.locationLabelHourly)
-    TextView mLocationLabel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +44,7 @@ public class HourlyForecastActivity extends ListActivity {
         mHours = Arrays.copyOf(parcelables, parcelables.length, Hourly[].class);
         HourlyAdapter adapter = new HourlyAdapter(this, mHours);
         setListAdapter(adapter);
-        TextView tv = (TextView) findViewById(R.id.locationLabelHourly);
-        tv.setText(locationForHourly);
+
     }
 
 
@@ -119,11 +117,11 @@ public class HourlyForecastActivity extends ListActivity {
 
 
 
-
-    @OnClick(R.id.locationLabelHourly)
-    public void finishHourlyActivity(View view) {
+    @OnClick(R.id.hourlyOkButton)
+    public void finishHourlyActivityone(View view) {
         finish();
     }
+
     @OnClick(R.id.thisHourLabel)
     public void finishHourlyActivitytwo(View view) {
         finish();

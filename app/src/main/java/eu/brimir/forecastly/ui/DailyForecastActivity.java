@@ -34,7 +34,7 @@ public class DailyForecastActivity extends ListActivity {
 
     private Daily[] mDays;
 
-    @Bind(R.id.locationLabelDaily) TextView mLocationLabel;
+
     @Bind(R.id.thisWeekLabel) TextView mWeekLabel;
 
     @Override
@@ -51,8 +51,7 @@ public class DailyForecastActivity extends ListActivity {
         DayAdapter adapter = new DayAdapter(this, mDays);
         setListAdapter(adapter);
 
-        TextView tv = (TextView) findViewById(R.id.locationLabelDaily);
-        tv.setText(locationForDaily);
+
 
 
 
@@ -150,7 +149,7 @@ public class DailyForecastActivity extends ListActivity {
 
     }
 
-    @OnClick(R.id.locationLabelDaily)
+    @OnClick(R.id.dailyOkButton)
     public void finishDailyActivity(View view) {
        finish();
     }
