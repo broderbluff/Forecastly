@@ -30,7 +30,7 @@
     <string name="close_app_button_title">Stäng</string>
     <string name="location_dialog_positive_button">Öppna Plats inställningar</string>
     <string name="location_dialog_title">Platstjänsten avstängd</string>
-    <string name="location_dialog_message">Platstjänster är avstängd, denna app kräver att veta var du befinner dig för att kunna får rätt väderdata.\n\nEfter du har satt igång platstjänster kan det ta några sekunder innan det rätta vädret visas.</string>
+    <string name="location_dialog_message">Platstjänster är avstängd, denna app kräver att veta var du befinner dig för att kunna får rätt väderdata.\n\n Efter du har satt igång platstjänster kan det ta några sekunder innan det rätta vädret visas.</string>
     <string name="precip_dialog_message1">"Upp till "</string>
     <string name="precip_dialog_message2">"mm per timme"</string>
     <string name="precip_dialog_title">Förväntad nederbörd</string>

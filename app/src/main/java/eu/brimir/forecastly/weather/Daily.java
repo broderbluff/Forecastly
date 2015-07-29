@@ -5,14 +5,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.sql.Date;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
-/**
- * Created by Patrik on 2015-07-10.
- */
+
 public class Daily implements Parcelable{
 
     private long mTime;

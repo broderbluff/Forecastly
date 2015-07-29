@@ -20,8 +20,8 @@
         android:layout_centerVertical="true"/>
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:id="@+id/iconImageView"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/circleImageView"
@@ -38,7 +38,7 @@
         android:layout_toEndOf="@+id/iconImageView"
        android:paddingLeft="10dp"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="18sp"
         tools:text="Onsdag"/>
 
     <TextView
@@ -73,7 +73,7 @@
             android:src="@drawable/arrow"/>
 
         <TextView
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="wrap_content"
             android:id="@+id/windSpeedLabel"
             android:textColor="@android:color/white"

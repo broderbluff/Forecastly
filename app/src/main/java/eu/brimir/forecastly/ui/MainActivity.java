@@ -67,7 +67,7 @@ import eu.brimir.forecastly.weather.Daily;
 import eu.brimir.forecastly.weather.Forecast;
 import eu.brimir.forecastly.weather.Hourly;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("ALL")
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void updateDisplay() {
         Current current = mForecast.getCurrent();
 
@@ -405,80 +406,89 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mPrecipValue.setText(current.getPrecipChance() + "%");
         mSummaryLabel.setText(current.getSummary());
 
-if(locale.equals("sv")){
-    if (current.getSummary().equals("Regnskurar")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+        if (locale.equals("sv")) {
+            if (current.getSummary().equals("Regnskurar")) {
+                //noinspection deprecation
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
 
-    } else if (current.getSummary().equals("Duggregn")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+            } else if (current.getSummary().equals("Duggregn")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
 
-    } else if (current.getSummary().equals("Regn")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+            } else if (current.getSummary().equals("Regn")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
 
-    } else if (current.getSummary().equals("Skyfall")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+            } else if (current.getSummary().equals("Skyfall")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
 
-    } else if (current.getIcon().equals("clear-day")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+            } else if (current.getIcon().equals("clear-day")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-    } else if (current.getSummary().equals("Lätt molnighet")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+            } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
-    } else if (current.getSummary().equals("Molnigt")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+            } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
 
-    } else if (current.getIcon().equals("partly-cloudy-night")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+            } else if (current.getIcon().equals("partly-cloudy-night")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
 
-    } else if (current.getIcon().equals("clear-night")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+            } else if (current.getIcon().equals("clear-night")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
 
-    } else if (current.getIcon().equals("cloudy")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+            } else if (current.getIcon().equals("cloudy")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
 
-    } else if (current.getIcon().equals("fog")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+            } else if (current.getIcon().equals("fog")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
 
-    } else if (current.getIcon().equals("snow")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+            } else if (current.getIcon().equals("snow")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
 
-    } else if (current.getIcon().equals("wind")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+            } else if (current.getIcon().equals("wind")) {
+                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
-    }
-}else{
-    if (current.getIcon().equals("rain")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+            }
+        } else {
+            switch (current.getIcon()) {
+                case "rain":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
 
 
+                    break;
+                case "clear-day":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-    } else if (current.getIcon().equals("clear-day")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+                    break;
+                case "partly-cloudy-day":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
 
-    } else if (current.getIcon().equals("partly-cloudy-day")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+                    break;
+                case "partly-cloudy-night":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
 
-    }  else if (current.getIcon().equals("partly-cloudy-night")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+                    break;
+                case "clear-night":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
 
-    } else if (current.getIcon().equals("clear-night")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+                    break;
+                case "cloudy":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
 
-    } else if (current.getIcon().equals("cloudy")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+                    break;
+                case "fog":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
 
-    } else if (current.getIcon().equals("fog")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+                    break;
+                case "snow":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
 
-    } else if (current.getIcon().equals("snow")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+                    break;
+                case "wind":
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
-    } else if (current.getIcon().equals("wind")) {
-        mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-    }
-}
-
+                    break;
+            }
+        }
 
 
         @SuppressWarnings("deprecation")
@@ -816,8 +826,7 @@ if(locale.equals("sv")){
 
 
             TextView title = (TextView) dialog.findViewById(R.id.pickedDayTextView);
-            TextView message = (TextView) dialog.findViewById(R.id.contentAlertDIalogTextView);
-            ImageView icon = (ImageView) dialog.findViewById(R.id.iconImageViewAlert);
+
             ImageView precipIcon = (ImageView) dialog.findViewById(R.id.precipIntensityMaxIcon);
             Button okButton = (Button) dialog.findViewById(R.id.alertDialogButton);
             LinearLayout icon3 = (LinearLayout) dialog.findViewById(R.id.linearlayout132);

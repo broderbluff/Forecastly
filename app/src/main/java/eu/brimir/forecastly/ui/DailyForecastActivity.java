@@ -1,13 +1,10 @@
 package eu.brimir.forecastly.ui;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -18,9 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import butterknife.Bind;
@@ -43,7 +37,7 @@ public class DailyForecastActivity extends ListActivity {
         setContentView(R.layout.activity_daily_forecast);
         ButterKnife.bind(this);
         Intent intent = getIntent();
-        String locationForDaily = intent.getExtras().getString("location");
+
 
         Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.DAILY_FORECAST);
 

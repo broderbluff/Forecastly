@@ -17,7 +17,7 @@
     <string name="hour_by_hour">De hora em hora</string>
     <string name="hour_label">De hora em hora</string>
     <string name="humidity">Umidade</string>
-    <string name="location_dialog_message">Serviços de localização está desligado, este aplicativo requer para saber a sua localização para obter os dados meteorológicos corretos. \ N \ nApós permitindo que os Serviços de Localização, pode levar alguns segundos antes do tempo correto está mostrando</string>
+    <string name="location_dialog_message">Serviços de localização está desligado, este aplicativo requer para saber a sua localização para obter os dados meteorológicos corretos. \n\n nApós permitindo que os Serviços de Localização, pode levar alguns segundos antes do tempo correto está mostrando</string>
     <string name="location_dialog_positive_button">Configurações do local Abertas</string>
     <string name="location_dialog_title">Serviços de localização não disponíveis</string>
     <string name="no_daily_forecast_data">Não há dados meteorológicos disponíveis</string>

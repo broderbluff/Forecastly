@@ -1,13 +1,10 @@
 package eu.brimir.forecastly.ui;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -20,7 +17,6 @@ import android.widget.TextView;
 
 import java.util.Arrays;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import eu.brimir.forecastly.R;
@@ -38,7 +34,7 @@ public class HourlyForecastActivity extends ListActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        String locationForHourly = intent.getExtras().getString("location");
+
         Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.HOURLY_FORECAST);
 
         mHours = Arrays.copyOf(parcelables, parcelables.length, Hourly[].class);
