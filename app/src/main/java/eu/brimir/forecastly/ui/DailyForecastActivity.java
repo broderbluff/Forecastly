@@ -76,7 +76,7 @@ public class DailyForecastActivity extends ListActivity {
         int iconId = mDays[position].getIconId();
 
         final Dialog dialog = new Dialog(this,
-                android.R.style.Theme_Translucent_NoTitleBar);
+                R.style.Theme_D1NoTitleDim);
         Window window = dialog.getWindow();
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

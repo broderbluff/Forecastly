@@ -25,6 +25,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -418,7 +421,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else if (current.getIcon().equals("clear-day")) {
             mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-        } else if (current.getIcon().equals("partly-cloudy-day")) {
+        } else if (current.getSummary().equals("Lätt molnighet")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+
+        } else if (current.getSummary().equals("Molnigt")) {
             mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
 
         } else if (current.getIcon().equals("partly-cloudy-night")) {
@@ -435,6 +441,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         } else if (current.getIcon().equals("snow")) {
             mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+        } else if (current.getIcon().equals("wind")) {
+            mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
         }
 
@@ -760,20 +769,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void openPrecipDialog(View view) {
         Current current = mForecast.getCurrent();
         if (current.getPrecipChance() != 0) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            @SuppressLint("InflateParams") View layout = inflater.inflate(R.layout.dialog, null);
+            final Dialog dialog = new Dialog(this,
+                    R.style.Theme_D1NoTitleDim);
+            Window window = dialog.getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.setCancelable(true);
 
-            builder.setView(layout);
+            dialog.setCanceledOnTouchOutside(true);
+            dialog.setContentView(R.layout.dialog);
 
 
-            TextView title = (TextView) layout.findViewById(R.id.pickedDayTextView);
-            TextView message = (TextView) layout.findViewById(R.id.contentAlertDIalogTextView);
-            ImageView icon = (ImageView) layout.findViewById(R.id.iconImageViewAlert);
-            ImageView precipIcon = (ImageView) layout.findViewById(R.id.precipIntensityMaxIcon);
-            Button okButton = (Button) layout.findViewById(R.id.alertDialogButton);
-            LinearLayout icon3 = (LinearLayout) layout.findViewById(R.id.linearlayout132);
-            TextView precipIntenstity = (TextView) layout.findViewById(R.id.precipIntensityMaxTextView);
+            TextView title = (TextView) dialog.findViewById(R.id.pickedDayTextView);
+            TextView message = (TextView) dialog.findViewById(R.id.contentAlertDIalogTextView);
+            ImageView icon = (ImageView) dialog.findViewById(R.id.iconImageViewAlert);
+            ImageView precipIcon = (ImageView) dialog.findViewById(R.id.precipIntensityMaxIcon);
+            Button okButton = (Button) dialog.findViewById(R.id.alertDialogButton);
+            LinearLayout icon3 = (LinearLayout) dialog.findViewById(R.id.linearlayout132);
+            TextView precipIntenstity = (TextView) dialog.findViewById(R.id.precipIntensityMaxTextView);
 
             icon3.setVisibility(View.GONE);
 
@@ -791,7 +806,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
 
 
-            final AlertDialog dialog = builder.create();
             okButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

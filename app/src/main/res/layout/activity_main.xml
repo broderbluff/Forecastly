@@ -114,7 +114,7 @@ style="@style/ShadowText"
                 android:layout_weight="50"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                style="@style/ShadowText"
+
                 android:id="@+id/precipLayout">
 
                 <ImageView
@@ -128,7 +128,7 @@ style="@style/ShadowText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-
+                    style="@style/ShadowText"
                     android:text="@string/no_temp"
                     android:textColor="@android:color/white"
                     android:textSize="24sp"/>
