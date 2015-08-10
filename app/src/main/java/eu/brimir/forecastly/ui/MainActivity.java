@@ -5,21 +5,24 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
+
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -42,6 +45,11 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -68,8 +76,9 @@ import eu.brimir.forecastly.weather.Forecast;
 import eu.brimir.forecastly.weather.Hourly;
 
 @SuppressWarnings("ALL")
-public class MainActivity extends AppCompatActivity implements LocationListener {
-
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    private GoogleApiClient mGoogleApiClient;
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
@@ -77,7 +86,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 5;
     private Forecast mForecast;
     private String provider;
-    private LocationManager locationManager;
+
+    private LocationRequest mLocationRequest;
+    private double currentLongitude;
+    private double currentLatitude;
     private double latitude;
     private double longitude;
     private String getLocality;
@@ -138,31 +150,75 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(1 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean enabled = service
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
+
+        if (!enabled) {
+
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+
+            builder.setTitle(R.string.location_dialog_title)
+                    .setMessage(R.string.location_dialog_message)
+                    .setNegativeButton(R.string.close_app_button_title, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            paramDialogInterface.dismiss();
+
+                        }
+                    })
+                    .setPositiveButton(R.string.location_dialog_positive_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    });
+
+            android.app.AlertDialog dialog = builder.create();
+
+
+            dialog.show();
+
+
+
+
+
+        }
         mAlertImage.setVisibility(View.INVISIBLE);
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        getLocation();
-        if (latitude != 0 && longitude != 0) {
-            getAddress(latitude, longitude);
-            getForecast(latitude, longitude);
 
 
-        } else {
-            getLocation();
-            getAddress(latitude, longitude);
-            getForecast(latitude, longitude);
-        }
+
+
+
+
 
 
         final Calendar cal = Calendar.getInstance();
         year_x = cal.get(Calendar.YEAR);
         month_x = cal.get(Calendar.MONTH);
         day_x = cal.get(Calendar.DAY_OF_MONTH);
+
+
 
 
         mTimeMachine.setOnClickListener(new View.OnClickListener() {
@@ -177,13 +233,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocation();
-                getAddress(latitude, longitude);
-                getForecast(latitude, longitude);
+
+
+                getAddress(currentLatitude, currentLongitude);
+                getForecast(currentLatitude, currentLongitude);
 
 
             }
         });
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
@@ -221,8 +289,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             Intent intent = new Intent(MainActivity.this, TimeMachineActivity.class);
 
-            intent.putExtra("latitude", latitude);
-            intent.putExtra("longitude", longitude);
+            intent.putExtra("latitude", currentLatitude);
+            intent.putExtra("longitude", currentLongitude);
             intent.putExtra("timeValue", mTimeMachineValue);
             intent.putExtra("year", year_x);
             intent.putExtra("month", month_x);
@@ -397,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else {
             mAlertImage.setVisibility(View.INVISIBLE);
         }
-        if (latitude == 0.0 && longitude == 0.0) {
+        if (currentLatitude == 0.0 && currentLongitude == 0.0) {
             mTemperatureLabel.setText("--");
         }
         mTemperatureLabel.setText(current.getTemperature() + "");
@@ -407,26 +475,205 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mSummaryLabel.setText(current.getSummary());
 
         if (locale.equals("sv")) {
-            if (current.getSummary().equals("Regnskurar")) {
+            Calendar cal = Calendar.getInstance();
+           int monthForBackground = cal.get(Calendar.MONTH);
+            if(monthForBackground == 12 && monthForBackground <= 2 ){
+                if (current.getSummary().equals("Regnskurar")) {
+                    //noinspection deprecation
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+
+                } else if (current.getSummary().equals("Duggregn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+
+                } else if (current.getSummary().equals("Regn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+
+                } else if (current.getSummary().equals("Skyfall")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+
+                } else if (current.getIcon().equals("clear-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+
+                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+                } else if (current.getIcon().equals("partly-cloudy-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+                } else if (current.getIcon().equals("clear-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+                } else if (current.getIcon().equals("cloudy")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+                } else if (current.getIcon().equals("fog")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+                } else if (current.getIcon().equals("snow")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+                } else if (current.getIcon().equals("wind")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+
+                }
+            }else  if(monthForBackground >= 3 && monthForBackground <= 5 ){
+                if (current.getSummary().equals("Regnskurar")) {
+                    //noinspection deprecation
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+
+                } else if (current.getSummary().equals("Duggregn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+
+                } else if (current.getSummary().equals("Regn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+
+                } else if (current.getSummary().equals("Skyfall")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+
+                } else if (current.getIcon().equals("clear-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+
+                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+                } else if (current.getIcon().equals("partly-cloudy-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+                } else if (current.getIcon().equals("clear-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+                } else if (current.getIcon().equals("cloudy")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+                } else if (current.getIcon().equals("fog")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+                } else if (current.getIcon().equals("snow")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+                } else if (current.getIcon().equals("wind")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+
+                }
+            }else if(monthForBackground >= 6 && monthForBackground <= 8 ){
+                if (current.getSummary().equals("Regnskurar")) {
+                    //noinspection deprecation
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+
+                } else if (current.getSummary().equals("Duggregn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
+
+                } else if (current.getSummary().equals("Regn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
+
+                } else if (current.getSummary().equals("Skyfall")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+
+                } else if (current.getIcon().equals("clear-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
+
+                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
+
+                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+                } else if (current.getIcon().equals("partly-cloudy-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+                } else if (current.getIcon().equals("clear-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+                } else if (current.getIcon().equals("cloudy")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+                } else if (current.getIcon().equals("fog")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
+
+                } else if (current.getIcon().equals("snow")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+                } else if (current.getIcon().equals("wind")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
+
+                }
+
+            }else if(monthForBackground >= 9 && monthForBackground <= 11 ){
+                if (current.getSummary().equals("Regnskurar")) {
+                    //noinspection deprecation
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
+
+                }else if (current.getSummary().equals("Duggregn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_autmn_bg));
+
+                } else if (current.getSummary().equals("Regn")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_autumn_bg));
+
+                } else if (current.getSummary().equals("Skyfall")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
+
+                } else if (current.getIcon().equals("clear-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_autumn_bg));
+
+                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day_autumn));
+
+                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
+
+                } else if (current.getIcon().equals("partly-cloudy-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
+
+                } else if (current.getIcon().equals("clear-night")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
+
+                } else if (current.getIcon().equals("cloudy")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
+
+                } else if (current.getIcon().equals("fog")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_autumn_bg));
+
+                } else if (current.getIcon().equals("snow")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
+
+                } else if (current.getIcon().equals("wind")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day_autumn));
+
+                }
+
+            }
+
+
+
+
+        } else if(locale.equals("en")){
+
+            if (current.getSummary().equals("Light Rain")) {
                 //noinspection deprecation
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
 
-            } else if (current.getSummary().equals("Duggregn")) {
+            } else if (current.getSummary().equals("Drizzle")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
 
-            } else if (current.getSummary().equals("Regn")) {
+            } else if (current.getSummary().equals("Rain")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
 
-            } else if (current.getSummary().equals("Skyfall")) {
+            } else if (current.getSummary().equals("Heavy Rain")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
 
             } else if (current.getIcon().equals("clear-day")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-            } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+            } else if (current.getSummary().equals("Partly Cloudy") && current.getIcon().equals("partly-cloudy-day")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
-            } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
+            } else if (current.getSummary().equals("Mostly Cloudy") && current.getIcon().equals("partly-cloudy-day")) {
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
 
             } else if (current.getIcon().equals("partly-cloudy-night")) {
@@ -448,7 +695,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
             }
-        } else {
+
+        }else{
             switch (current.getIcon()) {
                 case "rain":
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
@@ -499,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (locale.equals("en_US"))
 
         {
-            if (current.getTemperature() >= 77 && latitude != 0.0 && longitude != 0.0) {
+            if (current.getTemperature() >= 77 && currentLatitude != 0.0 && currentLongitude != 0.0) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -512,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         {
             String label = mTemperatureLabel.getText().toString();
-            if (current.getTemperature() >= 25 && label.equals("--")) {
+            if (current.getTemperature() >= 25 && currentLatitude != 0.0 && currentLongitude != 0.0) {
                 YoYo.with(Techniques.Tada)
                         .duration(700)
                         .playOn(findViewById(R.id.temperatureLabel));
@@ -649,58 +897,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void getLocation() {
 
-
-        // Get the location manager
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the locatioin provider -> use
-        // default
-
-
-        if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-
-
-            builder.setTitle(R.string.location_dialog_title)
-                    .setMessage(R.string.location_dialog_message)
-                    .setNegativeButton(R.string.close_app_button_title, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                            paramDialogInterface.dismiss();
-
-                        }
-                    })
-                    .setPositiveButton(R.string.location_dialog_positive_button, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-
-                            startActivity(myIntent);
-                        }
-                    });
-
-            android.app.AlertDialog dialog = builder.create();
-
-
-            dialog.show();
-
-        } else {
-            GetLocationAsyncTask locationAsyncTask = new GetLocationAsyncTask();
-            locationAsyncTask.execute();
-        }
-
-
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (provider.isEmpty()) {
-            getLocation();
-        }
-        locationManager.requestLocationUpdates(provider, MIN_TIME_FOR_UPDATE, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+        mGoogleApiClient.connect();
+
+
 
 
     }
@@ -708,38 +913,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(this);
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
 
-        // latitude = 37.8267;
-        //  longitude =-122.423;
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        getForecast(latitude, longitude);
-        getAddress(latitude, longitude);
-
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Toast.makeText(this, "Enabled new provider " + provider,
-                Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Toast.makeText(this, "Disabled provider " + provider,
-                Toast.LENGTH_SHORT).show();
-    }
 
     @OnClick(R.id.sevenDaysButton)
     public void startDailyActivity(View view) {
@@ -862,6 +1042,52 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "Location services connected.");
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (location == null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            getAddress(currentLatitude, currentLongitude);
+            getForecast(currentLatitude, currentLongitude);
+        } else {
+            handleNewLocation(location);
+
+        }
+    }
+    private void handleNewLocation(Location location) {
+
+        currentLatitude = location.getLatitude();
+
+        currentLongitude = location.getLongitude();
+        getAddress(currentLatitude, currentLongitude);
+        getForecast(currentLatitude, currentLongitude);
+    }
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        handleNewLocation(location);
+
+    }
+
 
     private class GetAddressAsynctask extends AsyncTask<Object, Void, Void> {
 
@@ -911,38 +1137,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private class GetLocationAsyncTask extends AsyncTask<Object, Void, Void> {
 
-        @Override
-        protected Void doInBackground(Object... params) {
-
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setAltitudeRequired(false);
-            criteria.setBearingRequired(false);
-            criteria.setCostAllowed(true);
-            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
-
-            provider = locationManager.getBestProvider(criteria, true);
-
-            location = locationManager.getLastKnownLocation(provider);
-
-
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-
-            if (location != null) {
-                System.out.println("Provider " + provider + " has been selected.");
-                onLocationChanged(location);
-            }
-        }
-    }
 
 }
 

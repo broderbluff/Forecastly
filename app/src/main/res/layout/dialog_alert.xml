@@ -46,7 +46,8 @@
 
             android:src="@drawable/alertdialogarrow"
 
-            android:layout_marginTop="41dp"
+            android:layout_marginTop="45dp"
+
             android:layout_below="@+id/linearLayout3"
             android:layout_centerHorizontal="true"/>
 
@@ -54,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/dialog_alert_title"
+            android:layout_marginBottom="10dp"
             android:id="@+id/tvStormApproaching"
             android:layout_below="@+id/linearLayout3"
             android:layout_centerHorizontal="true"
@@ -76,11 +78,12 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_below="@+id/contentDialog"
-        android:paddingTop="15dp"
+        android:layout_marginTop="15dp"
         android:background="#80000000"
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:id="@+id/linearLayout4">
 
         <Button
