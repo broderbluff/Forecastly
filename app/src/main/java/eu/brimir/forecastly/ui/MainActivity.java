@@ -1077,11 +1077,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(R.layout.dialog_pick_place);
-
+        dialog.getWindow().setSoftInputMode(wlp.SOFT_INPUT_STATE_VISIBLE);
 
         final AutoCompleteTextView autocompleteView = (AutoCompleteTextView) dialog.findViewById(R.id.autocomplete);
         autocompleteView.setAdapter(new PlacesAutoCompleteAdapter(MainActivity.this, R.layout.list_item));
-
+        autocompleteView.requestFocus();
 
         autocompleteView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -1090,7 +1090,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 // in the list (AdapterView)
 
                 description = (String) parent.getItemAtPosition(position);
-
+                addressToCoordinates();
+                description = null;
+                dialog.dismiss();
             }
         });
 
@@ -1102,6 +1104,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 dialog.dismiss();
                 description = null;
+
             }
         });
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -1110,28 +1113,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (description == null){
                    Toast.makeText(MainActivity.this, R.string.pick_location_toast, Toast.LENGTH_LONG).show();
                 }else{
-                    Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-                    List<Address> addresses = null;
-                    try {
-                        addresses = geocoder.getFromLocationName(description, 1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (addresses.size() > 0) {
-
-                        pickedLatitude = addresses.get(0).getLatitude();
-
-                        pickedLongitude = addresses.get(0).getLongitude();
-                    }
-                    getAddress(pickedLatitude, pickedLongitude);
-                    getForecast(pickedLatitude, pickedLongitude);
-                    SharedPreferences pref = MainActivity.this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putFloat(Constants.KEY_LATITUDE, (float) pickedLatitude);
-                    editor.putFloat(Constants.KEY_LONGITUDE, (float) pickedLongitude);
-
-
-                    editor.apply();
+                    addressToCoordinates();
                     description = null;
                     dialog.dismiss();
                 }
@@ -1145,6 +1127,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
+
+    public void addressToCoordinates(){
+        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocationName(description, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+
+            pickedLatitude = addresses.get(0).getLatitude();
+
+            pickedLongitude = addresses.get(0).getLongitude();
+        }
+        getAddress(pickedLatitude, pickedLongitude);
+        getForecast(pickedLatitude, pickedLongitude);
+        SharedPreferences pref = MainActivity.this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putFloat(Constants.KEY_LATITUDE, (float) pickedLatitude);
+        editor.putFloat(Constants.KEY_LONGITUDE, (float) pickedLongitude);
+
+
+        editor.apply();
+    }
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");

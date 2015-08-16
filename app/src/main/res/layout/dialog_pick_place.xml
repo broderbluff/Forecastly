@@ -44,6 +44,8 @@
             android:layout_marginRight="8dp"
             style="@style/Base.Widget.AppCompat.EditText"
             android:layout_marginTop="50dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:textColor="@android:color/white"
             android:hint="@string/type_and_pick_location"
             android:textColorHint="@android:color/darker_gray"/>
@@ -96,6 +98,7 @@
         android:id="@+id/textView3"
         android:layout_above="@+id/linearLayout4"
         android:layout_centerHorizontal="true"
+
         android:textColor="#808080"
         android:textSize="10sp" />
 
