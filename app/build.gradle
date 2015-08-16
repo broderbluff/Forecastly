@@ -9,8 +9,8 @@ android {
         applicationId "eu.brimir.forecastly"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 22
-        versionName "1.1.7"
+        versionCode 23
+        versionName "1.2"
     }
     buildTypes {
         release {

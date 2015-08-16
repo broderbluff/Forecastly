@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import eu.brimir.forecastly.R;
 import eu.brimir.forecastly.adapters.HourlyAdapter;
+import eu.brimir.forecastly.utils.Constants;
 import eu.brimir.forecastly.weather.Hourly;
 
 public class HourlyForecastActivity extends ListActivity {
@@ -35,7 +36,7 @@ public class HourlyForecastActivity extends ListActivity {
 
         Intent intent = getIntent();
 
-        Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.HOURLY_FORECAST);
+        Parcelable[] parcelables = intent.getParcelableArrayExtra(Constants.HOURLY_FORECAST);
 
         mHours = Arrays.copyOf(parcelables, parcelables.length, Hourly[].class);
         HourlyAdapter adapter = new HourlyAdapter(this, mHours);

@@ -61,7 +61,7 @@ public class TimeMachineActivity extends AppCompatActivity {
     @Bind(R.id.iconImageView)
     ImageView mIconImageView;
 
-    @Bind(R.id.yearLabel)
+    @Bind(R.id.locationLabel)
     TextView mYearLabel;
 
     @Bind(R.id.locationLabelTimeMachine)

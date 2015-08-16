@@ -28,7 +28,7 @@
             android:id="@+id/temperatureLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/yearLabel"
+            android:layout_below="@+id/locationLabel"
             android:layout_centerHorizontal="true"
             android:text="@string/no_temp"
 style="@style/ShadowText"
@@ -58,7 +58,7 @@ style="@style/ShadowText"
             android:textColor="#80f4ffea"/>
 
         <TextView
-            android:id="@+id/yearLabel"
+            android:id="@+id/locationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/timeLabel"

@@ -39,5 +39,9 @@
     <string name="dialog_alert_title">Storm närmar sig</string>
     <string name="daily_mmanhour">mm per timme</string>
     <string name="daily_upto">"Upp till "</string>
+    <string name="pick_location_toast">Du måste välja en plats</string>
+    <string name="type_and_pick_location">Skriv in och välj en plats</string>
+    <string name="type_desired_location_title">Skriv in önskad plats</string>
+    <string name="powered_by_google">Tillhandahålls av Google</string>
 
 </resources>

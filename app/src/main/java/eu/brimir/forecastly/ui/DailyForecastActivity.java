@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import eu.brimir.forecastly.R;
 import eu.brimir.forecastly.adapters.DayAdapter;
+import eu.brimir.forecastly.utils.Constants;
 import eu.brimir.forecastly.weather.Daily;
 
 public class DailyForecastActivity extends ListActivity {
@@ -39,7 +40,7 @@ public class DailyForecastActivity extends ListActivity {
         Intent intent = getIntent();
 
 
-        Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.DAILY_FORECAST);
+        Parcelable[] parcelables = intent.getParcelableArrayExtra(Constants.DAILY_FORECAST);
 
         mDays = Arrays.copyOf(parcelables, parcelables.length, Daily[].class);
         DayAdapter adapter = new DayAdapter(this, mDays);

@@ -9,10 +9,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 
@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,8 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -70,6 +73,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import eu.brimir.forecastly.R;
+import eu.brimir.forecastly.adapters.PlacesAutoCompleteAdapter;
+import eu.brimir.forecastly.utils.Constants;
 import eu.brimir.forecastly.weather.Current;
 import eu.brimir.forecastly.weather.Daily;
 import eu.brimir.forecastly.weather.Forecast;
@@ -80,18 +85,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String DAILY_FORECAST = "DAILY_FORECAST";
-    public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 500;
-    private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 5;
+
     private Forecast mForecast;
     private String provider;
-
+    private String description;
     private LocationRequest mLocationRequest;
     private double currentLongitude;
     private double currentLatitude;
     private double latitude;
     private double longitude;
+    private double pickedLatitude;
+    private double pickedLongitude;
     private String getLocality;
     private boolean stormAlert = false;
     private List<Address> addresses;
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private String localeUS = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
     private AnimationDrawable alertAnimation;
-
+    private    SharedPreferences savedLocation;
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
 
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
 
-    @Bind(R.id.yearLabel)
+    @Bind(R.id.locationLabel)
     TextView mLocationLabel;
 
 
@@ -150,6 +154,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        savedLocation = this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
+        savedLocation.edit().clear().commit();
+
+
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
@@ -197,28 +206,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             dialog.show();
 
 
-
-
-
         }
         mAlertImage.setVisibility(View.INVISIBLE);
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
 
-
-
-
-
-
-
-
         final Calendar cal = Calendar.getInstance();
         year_x = cal.get(Calendar.YEAR);
         month_x = cal.get(Calendar.MONTH);
         day_x = cal.get(Calendar.DAY_OF_MONTH);
-
-
 
 
         mTimeMachine.setOnClickListener(new View.OnClickListener() {
@@ -234,7 +231,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View v) {
 
+                stormAlert = false;
+                mAlertImage.setVisibility(View.INVISIBLE);
 
+
+                savedLocation = MainActivity.this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
+                savedLocation.edit().clear().commit();
+
+                updateDisplay();
                 getAddress(currentLatitude, currentLongitude);
                 getForecast(currentLatitude, currentLongitude);
 
@@ -243,31 +247,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
 
-
-
-
-
-
-
-
-
-
-
-
-    }
-
-    private void alertIconAnimation(ImageView img) {
-        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-        animation.setDuration(500); // duration - half a second
-        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
-        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
-        img.startAnimation(animation);
-
-
-        img.setBackgroundResource(R.drawable.alertanimation);
-        alertAnimation = (AnimationDrawable) img.getBackground();
-        alertAnimation.start();
     }
 
 
@@ -448,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
             mRefreshImageView.setVisibility(View.INVISIBLE);
+
         } else {
             mProgressBar.setVisibility(View.INVISIBLE);
             mRefreshImageView.setVisibility(View.VISIBLE);
@@ -459,12 +439,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Current current = mForecast.getCurrent();
 
 
+        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
+
+
         if (stormAlert) {
             mAlertImage.setVisibility(View.VISIBLE);
-            alertIconAnimation(mAlertImage);
-        } else {
+            mAlertImage.startAnimation(animation);
+
+
+            mAlertImage.setBackgroundResource(R.drawable.alertanimation);
+            alertAnimation = (AnimationDrawable) mAlertImage.getBackground();
+            alertAnimation.start();
+        } else if (stormAlert == false) {
+
+
+            mAlertImage.setAnimation(null);
+
             mAlertImage.setVisibility(View.INVISIBLE);
+
+
         }
+
+
         if (currentLatitude == 0.0 && currentLongitude == 0.0) {
             mTemperatureLabel.setText("--");
         }
@@ -476,8 +476,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         if (locale.equals("sv")) {
             Calendar cal = Calendar.getInstance();
-           int monthForBackground = cal.get(Calendar.MONTH);
-            if(monthForBackground == 12 && monthForBackground <= 2 ){
+            int monthForBackground = cal.get(Calendar.MONTH);
+            if (monthForBackground == 12 && monthForBackground <= 2) {
                 if (current.getSummary().equals("Regnskurar")) {
                     //noinspection deprecation
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
@@ -494,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (current.getIcon().equals("clear-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
                 } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
                 }
-            }else  if(monthForBackground >= 3 && monthForBackground <= 5 ){
+            } else if (monthForBackground >= 3 && monthForBackground <= 5) {
                 if (current.getSummary().equals("Regnskurar")) {
                     //noinspection deprecation
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
@@ -536,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (current.getIcon().equals("clear-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
                 } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
@@ -561,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
 
                 }
-            }else if(monthForBackground >= 6 && monthForBackground <= 8 ){
+            } else if (monthForBackground >= 6 && monthForBackground <= 8) {
                 if (current.getSummary().equals("Regnskurar")) {
                     //noinspection deprecation
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
@@ -575,10 +575,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (current.getSummary().equals("Skyfall")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
 
-                } else if (current.getIcon().equals("clear-day")) {
+                } else if (current.getSummary().equals("Duggregn och svag vind")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_breeze_photo_bg));
+
+                } else if (current.getSummary().equals("Svag vind och lätt molnighet")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.breeze_light_cloudy_photo_bg));
+
+                }else if (current.getSummary().equals("Svag vind och molnigt")) {
+                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.breeze_cloudy_photo_bg));
+
+                }  else if (current.getIcon().equals("clear-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
 
-                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
 
                 } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
@@ -604,12 +613,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 }
 
-            }else if(monthForBackground >= 9 && monthForBackground <= 11 ){
+            } else if (monthForBackground >= 9 && monthForBackground <= 11) {
                 if (current.getSummary().equals("Regnskurar")) {
                     //noinspection deprecation
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
 
-                }else if (current.getSummary().equals("Duggregn")) {
+                } else if (current.getSummary().equals("Duggregn")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_autmn_bg));
 
                 } else if (current.getSummary().equals("Regn")) {
@@ -621,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (current.getIcon().equals("clear-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_autumn_bg));
 
-                }  else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
+                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day_autumn));
 
                 } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
@@ -650,9 +659,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
 
 
-
-
-        } else if(locale.equals("en")){
+        } else if (locale.equals("en")) {
 
             if (current.getSummary().equals("Light Rain")) {
                 //noinspection deprecation
@@ -696,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             }
 
-        }else{
+        } else {
             switch (current.getIcon()) {
                 case "rain":
                     mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
@@ -857,7 +864,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             stormAlert = true;
         } else {
             stormAlert = false;
+
+
         }
+
+
         current.setPrecipChance(currently.getDouble("precipProbability"));
         if (current.getPrecipChance() != 0) {
             current.setPrecipType(currently.getString("precipType"));
@@ -867,7 +878,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         current.setSummary(currently.getString("summary"));
         current.setTemperature(currently.getDouble("temperature"));
         current.setTimeZone(timezone);
-
 
         return current;
 
@@ -898,7 +908,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -906,13 +915,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mGoogleApiClient.connect();
 
 
+    }
 
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        savedLocation = this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
+        savedLocation.edit().clear().commit();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
@@ -920,11 +937,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-
     @OnClick(R.id.sevenDaysButton)
     public void startDailyActivity(View view) {
         Intent intent = new Intent(this, DailyForecastActivity.class);
-        intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
+        intent.putExtra(Constants.DAILY_FORECAST, mForecast.getDailyForecast());
         intent.putExtra("location", locationForDaily);
         startActivity(intent);
     }
@@ -932,7 +948,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @OnClick(R.id.hourlyButton)
     public void startHourlyActivity(View view) {
         Intent intent = new Intent(this, HourlyForecastActivity.class);
-        intent.putExtra(HOURLY_FORECAST, mForecast.getHourlyForecast());
+        intent.putExtra(Constants.HOURLY_FORECAST, mForecast.getHourlyForecast());
         intent.putExtra("location", locationForDaily);
         startActivity(intent);
     }
@@ -1042,6 +1058,93 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+
+    @OnClick(R.id.locationLabel)
+    public void openPickLocationDialog(View view) {
+
+
+        final Dialog dialog = new Dialog(this,
+                R.style.Theme_D1NoTitleDim2);
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+        wlp.gravity = Gravity.TOP;
+        wlp.y = 50;
+        window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
+
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setContentView(R.layout.dialog_pick_place);
+
+
+        final AutoCompleteTextView autocompleteView = (AutoCompleteTextView) dialog.findViewById(R.id.autocomplete);
+        autocompleteView.setAdapter(new PlacesAutoCompleteAdapter(MainActivity.this, R.layout.list_item));
+
+
+        autocompleteView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get data associated with the specified position
+                // in the list (AdapterView)
+
+                description = (String) parent.getItemAtPosition(position);
+
+            }
+        });
+
+
+        Button okButton = (Button) dialog.findViewById(R.id.alertDialogButton);
+        Button closeButton = (Button)dialog.findViewById(R.id.alertDialogCloseButton);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                description = null;
+            }
+        });
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (description == null){
+                   Toast.makeText(MainActivity.this, R.string.pick_location_toast, Toast.LENGTH_LONG).show();
+                }else{
+                    Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                    List<Address> addresses = null;
+                    try {
+                        addresses = geocoder.getFromLocationName(description, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (addresses.size() > 0) {
+
+                        pickedLatitude = addresses.get(0).getLatitude();
+
+                        pickedLongitude = addresses.get(0).getLongitude();
+                    }
+                    getAddress(pickedLatitude, pickedLongitude);
+                    getForecast(pickedLatitude, pickedLongitude);
+                    SharedPreferences pref = MainActivity.this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putFloat(Constants.KEY_LATITUDE, (float) pickedLatitude);
+                    editor.putFloat(Constants.KEY_LONGITUDE, (float) pickedLongitude);
+
+
+                    editor.apply();
+                    description = null;
+                    dialog.dismiss();
+                }
+
+            }
+        });
+
+
+        dialog.show();
+
+    }
+
+
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
@@ -1053,9 +1156,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             handleNewLocation(location);
 
         }
-        getAddress(currentLatitude, currentLongitude);
-        getForecast(currentLatitude, currentLongitude);
+        float fLat = savedLocation.getFloat(Constants.KEY_LATITUDE, 0);
+        float fLong = savedLocation.getFloat(Constants.KEY_LONGITUDE, 0);
+        if(fLat == 0 && fLong == 0){
+
+
+            getAddress(currentLatitude, currentLongitude);
+            getForecast(currentLatitude, currentLongitude);
+        }else{
+            pickedLatitude = fLat;
+            pickedLongitude = fLong;
+            getAddress(pickedLatitude, pickedLongitude);
+            getForecast(pickedLatitude, pickedLongitude);
+        }
+
+
     }
+
+
     private void handleNewLocation(Location location) {
 
         currentLatitude = location.getLatitude();
@@ -1063,6 +1181,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         currentLongitude = location.getLongitude();
 
     }
+
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -1136,7 +1255,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
 
     }
-
 
 
 }

@@ -39,4 +39,8 @@
     <string name="week">Semana</string>
     <string name="weeks_weather_label">El tiempo para la semana</string>
     <string name="will_the_temp">"La temperatura más alta será "</string>
+    <string name="pick_location_toast">Usted debe escoger un lugar</string>
+    <string name="type_and_pick_location">Escriba y escoger una ubicación</string>
+    <string name="type_desired_location_title">Tipo local desejado</string>
+    <string name="powered_by_google">Desarrollado por Google</string>
 </resources>

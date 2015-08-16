@@ -58,6 +58,11 @@
     <string name="daily_upto">"Up to "</string>
     <string name="daily_mmanhour">mm an hour</string>
 
+    <string name="pick_location_toast">You must pick a location</string>
+    <string name="type_desired_location_title">Type desired location</string>
+    <string name="type_and_pick_location">Type and pick a location</string>
+    <string name="powered_by_google">Powered by Google</string>
+
 
 </resources>
 
