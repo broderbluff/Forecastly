@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -1048,20 +1048,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            getAddress(currentLatitude, currentLongitude);
-            getForecast(currentLatitude, currentLongitude);
+
         } else {
             handleNewLocation(location);
 
         }
+        getAddress(currentLatitude, currentLongitude);
+        getForecast(currentLatitude, currentLongitude);
     }
     private void handleNewLocation(Location location) {
 
         currentLatitude = location.getLatitude();
 
         currentLongitude = location.getLongitude();
-        getAddress(currentLatitude, currentLongitude);
-        getForecast(currentLatitude, currentLongitude);
+
     }
     @Override
     public void onConnectionSuspended(int i) {
