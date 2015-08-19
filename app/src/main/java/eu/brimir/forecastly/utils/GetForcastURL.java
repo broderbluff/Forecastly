@@ -3,9 +3,7 @@ package eu.brimir.forecastly.utils;
 
 import java.util.Locale;
 
-/**
- * Created by brode on 2015-08-19.
- */
+
 public class GetForcastURL {
 
 

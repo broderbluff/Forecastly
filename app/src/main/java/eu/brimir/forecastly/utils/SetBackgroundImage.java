@@ -127,13 +127,13 @@ public class SetBackgroundImage {
                 } else if (summary.equals("Skyfall")) {
                     bgImage= Forecastly.getAppContext().getResources().getDrawable(R.drawable.heavy_rain_photo_bg);
 
-                } else if (summary.equals("Duggregn och svag vind")) {
+                } else if (summary.equals("Duggregn och måttlig vind")) {
                     bgImage= Forecastly.getAppContext().getResources().getDrawable(R.drawable.drizzle_breeze_photo_bg);
 
-                } else if (summary.equals("Svag vind och lätt molnighet")) {
+                } else if (summary.equals("Måttlig vind och lätt molnighet")) {
                     bgImage= Forecastly.getAppContext().getResources().getDrawable(R.drawable.breeze_light_cloudy_photo_bg);
 
-                }else if (summary.equals("Svag vind och molnigt")) {
+                }else if (summary.equals("Måttlig vind och molnigt")) {
                     bgImage= Forecastly.getAppContext().getResources().getDrawable(R.drawable.breeze_cloudy_photo_bg);
 
                 }  else if (icon.equals("clear-day")) {
