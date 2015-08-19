@@ -75,6 +75,8 @@ import butterknife.OnClick;
 import eu.brimir.forecastly.R;
 import eu.brimir.forecastly.adapters.PlacesAutoCompleteAdapter;
 import eu.brimir.forecastly.utils.Constants;
+import eu.brimir.forecastly.utils.GetForcastURL;
+import eu.brimir.forecastly.utils.SetBackgroundImage;
 import eu.brimir.forecastly.weather.Current;
 import eu.brimir.forecastly.weather.Daily;
 import eu.brimir.forecastly.weather.Forecast;
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private String localeUS = Locale.getDefault().toString();
     // private SwipeRefreshLayout mSwipeRefreshLayout;
     private AnimationDrawable alertAnimation;
-    private    SharedPreferences savedLocation;
+    private SharedPreferences savedLocation;
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
 
@@ -304,68 +306,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void getForecast(double latitude, double longitude) {
-        String apiKey = "6d73ebc175b9afd40c6e48e5700ca316";
+        GetForcastURL getForcastURL = new GetForcastURL();
 
-
-        String forecastUrl;
-        if (locale.equals("sv")) {
-
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=sv&units=si&exclude=minutely,flags";
-        } else if (locale.equals("ar")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=ar&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("bs")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=bs&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("de")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=de&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("es")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=es&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("fr")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=fr&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("it")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=it&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("nl")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("pl")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=pl&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("pt")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=pt&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("ru")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=ru&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("sk")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=sk&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("tet")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=tet&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("tr")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=nl&units=auto&exclude=minutely,flags";
-        } else if (locale.equals("zh")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?lang=zh&units=auto&exclude=minutely,flags";
-        } else if (localeUS.equals("en_US")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?exclude=minutely,flags";
-        } else if (localeUS.equals("en_GB")) {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?units=uk2&exclude=minutely,flags";
-        } else {
-            forecastUrl = "https://api.forecast.io/forecast/" + apiKey +
-                    "/" + latitude + "," + longitude + "?units=auto&exclude=minutely,flags";
-        }
-
-
+        String forecastUrl = getForcastURL.getURL(latitude, longitude);
         if (isNetworkAvailable()) {
             toggleRefresh();
             OkHttpClient client = new OkHttpClient();
@@ -473,278 +416,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mHumidityValue.setText(current.getHumidity() + "%");
         mPrecipValue.setText(current.getPrecipChance() + "%");
         mSummaryLabel.setText(current.getSummary());
+        SetBackgroundImage bgImage = new SetBackgroundImage();
+        Drawable bg = bgImage.getBackgroundImage(current.getSummary(), current.getIcon());
 
-        if (locale.equals("sv")) {
-            Calendar cal = Calendar.getInstance();
-            int monthForBackground = cal.get(Calendar.MONTH);
-            if (monthForBackground == 12 && monthForBackground <= 2) {
-                if (current.getSummary().equals("Regnskurar")) {
-                    //noinspection deprecation
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
-
-                } else if (current.getSummary().equals("Duggregn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
-
-                } else if (current.getSummary().equals("Regn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
-
-                } else if (current.getSummary().equals("Skyfall")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
-
-                } else if (current.getIcon().equals("clear-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
-
-                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
-
-                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-                } else if (current.getIcon().equals("partly-cloudy-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-                } else if (current.getIcon().equals("clear-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-                } else if (current.getIcon().equals("cloudy")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-                } else if (current.getIcon().equals("fog")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
-
-                } else if (current.getIcon().equals("snow")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-                } else if (current.getIcon().equals("wind")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-                }
-            } else if (monthForBackground >= 3 && monthForBackground <= 5) {
-                if (current.getSummary().equals("Regnskurar")) {
-                    //noinspection deprecation
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
-
-                } else if (current.getSummary().equals("Duggregn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
-
-                } else if (current.getSummary().equals("Regn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
-
-                } else if (current.getSummary().equals("Skyfall")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
-
-                } else if (current.getIcon().equals("clear-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
-
-                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
-
-                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-                } else if (current.getIcon().equals("partly-cloudy-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-                } else if (current.getIcon().equals("clear-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-                } else if (current.getIcon().equals("cloudy")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-                } else if (current.getIcon().equals("fog")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
-
-                } else if (current.getIcon().equals("snow")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-                } else if (current.getIcon().equals("wind")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-                }
-            } else if (monthForBackground >= 6 && monthForBackground <= 8) {
-                if (current.getSummary().equals("Regnskurar")) {
-                    //noinspection deprecation
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
-
-                } else if (current.getSummary().equals("Duggregn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
-
-                } else if (current.getSummary().equals("Regn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
-
-                } else if (current.getSummary().equals("Skyfall")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
-
-                } else if (current.getSummary().equals("Duggregn och svag vind")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_breeze_photo_bg));
-
-                } else if (current.getSummary().equals("Svag vind och lätt molnighet")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.breeze_light_cloudy_photo_bg));
-
-                }else if (current.getSummary().equals("Svag vind och molnigt")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.breeze_cloudy_photo_bg));
-
-                }  else if (current.getIcon().equals("clear-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
-
-                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
-
-                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-                } else if (current.getIcon().equals("partly-cloudy-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-                } else if (current.getIcon().equals("clear-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-                } else if (current.getIcon().equals("cloudy")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-                } else if (current.getIcon().equals("fog")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
-
-                } else if (current.getIcon().equals("snow")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-                } else if (current.getIcon().equals("wind")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-                }
-
-            } else if (monthForBackground >= 9 && monthForBackground <= 11) {
-                if (current.getSummary().equals("Regnskurar")) {
-                    //noinspection deprecation
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
-
-                } else if (current.getSummary().equals("Duggregn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_autmn_bg));
-
-                } else if (current.getSummary().equals("Regn")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_autumn_bg));
-
-                } else if (current.getSummary().equals("Skyfall")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
-
-                } else if (current.getIcon().equals("clear-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_autumn_bg));
-
-                } else if (current.getSummary().equals("Lätt molnighet") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day_autumn));
-
-                } else if (current.getSummary().equals("Molnigt") && current.getIcon().equals("partly-cloudy-day")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-                } else if (current.getIcon().equals("partly-cloudy-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-                } else if (current.getIcon().equals("clear-night")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-                } else if (current.getIcon().equals("cloudy")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-                } else if (current.getIcon().equals("fog")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_autumn_bg));
-
-                } else if (current.getIcon().equals("snow")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-                } else if (current.getIcon().equals("wind")) {
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day_autumn));
-
-                }
-
-            }
-
-
-        } else if (locale.equals("en")) {
-
-            if (current.getSummary().equals("Light Rain")) {
-                //noinspection deprecation
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_showers_photo_bg));
-
-            } else if (current.getSummary().equals("Drizzle")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
-
-            } else if (current.getSummary().equals("Rain")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.rain_photo_bg));
-
-            } else if (current.getSummary().equals("Heavy Rain")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.heavy_rain_photo_bg));
-
-            } else if (current.getIcon().equals("clear-day")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
-
-            } else if (current.getSummary().equals("Partly Cloudy") && current.getIcon().equals("partly-cloudy-day")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.light_cloudy_photo_day));
-
-            } else if (current.getSummary().equals("Mostly Cloudy") && current.getIcon().equals("partly-cloudy-day")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-            } else if (current.getIcon().equals("partly-cloudy-night")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-            } else if (current.getIcon().equals("clear-night")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-            } else if (current.getIcon().equals("cloudy")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-            } else if (current.getIcon().equals("fog")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
-
-            } else if (current.getIcon().equals("snow")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-            } else if (current.getIcon().equals("wind")) {
-                mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-            }
-
-        } else {
-            switch (current.getIcon()) {
-                case "rain":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.drizzle_photo_bg));
-
-
-                    break;
-                case "clear-day":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_day_photo_bg));
-
-                    break;
-                case "partly-cloudy-day":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.partly_cloudy_day_photo_bg));
-
-                    break;
-                case "partly-cloudy-night":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_night_photo_bg));
-
-                    break;
-                case "clear-night":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.clear_night_photo_bg));
-
-                    break;
-                case "cloudy":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_photo_bg));
-
-                    break;
-                case "fog":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.fog_photo_bg));
-
-                    break;
-                case "snow":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.snow_photo_bg));
-
-                    break;
-                case "wind":
-                    mImageviewLayout.setImageDrawable(getResources().getDrawable(R.drawable.windy_photo_day));
-
-                    break;
-            }
-        }
-
+        mImageviewLayout.setImageDrawable(bg);
 
         @SuppressWarnings("deprecation")
         Drawable drawable = getResources().getDrawable(current.getIconId());
@@ -1068,6 +743,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Window window = dialog.getWindow();
         WindowManager.LayoutParams wlp = window.getAttributes();
         wlp.gravity = Gravity.TOP;
+
         wlp.y = 50;
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -1098,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         Button okButton = (Button) dialog.findViewById(R.id.alertDialogButton);
-        Button closeButton = (Button)dialog.findViewById(R.id.alertDialogCloseButton);
+        Button closeButton = (Button) dialog.findViewById(R.id.alertDialogCloseButton);
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1110,9 +786,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (description == null){
-                   Toast.makeText(MainActivity.this, R.string.pick_location_toast, Toast.LENGTH_LONG).show();
-                }else{
+                if (description == null) {
+                    Toast.makeText(MainActivity.this, R.string.pick_location_toast, Toast.LENGTH_LONG).show();
+                } else {
                     addressToCoordinates();
                     description = null;
                     dialog.dismiss();
@@ -1127,8 +803,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-
-    public void addressToCoordinates(){
+    public void addressToCoordinates() {
         Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
         List<Address> addresses = null;
         try {
@@ -1152,6 +827,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         editor.apply();
     }
+
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
@@ -1165,12 +841,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         float fLat = savedLocation.getFloat(Constants.KEY_LATITUDE, 0);
         float fLong = savedLocation.getFloat(Constants.KEY_LONGITUDE, 0);
-        if(fLat == 0 && fLong == 0){
+        if (fLat == 0 && fLong == 0) {
 
 
             getAddress(currentLatitude, currentLongitude);
             getForecast(currentLatitude, currentLongitude);
-        }else{
+        } else {
             pickedLatitude = fLat;
             pickedLongitude = fLong;
             getAddress(pickedLatitude, pickedLongitude);
