@@ -59,6 +59,9 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Minutes;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    private static final long TEN_MINUTES = 10 * 60 * 1000;
     private Forecast mForecast;
     private String provider;
     private String description;
@@ -114,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     // private SwipeRefreshLayout mSwipeRefreshLayout;
     private AnimationDrawable alertAnimation;
     private SharedPreferences savedLocation;
+    private SharedPreferences prefs = null;
+
+    private DateTime lastUpdated;
     @Bind(R.id.timeLabel)
     TextView mTimeLabel;
 
@@ -156,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        lastUpdated = null;
         savedLocation = this.getSharedPreferences(Constants.KEY_SHARED_PREF, 0);
         savedLocation.edit().clear().commit();
 
@@ -248,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-
+        prefs = getSharedPreferences("eu.brimir.forecastly", MODE_PRIVATE);
     }
 
 
@@ -348,6 +354,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                 @Override
                                 public void run() {
                                     updateDisplay();
+
+                                    lastUpdated = new DateTime();
 
                                 }
                             });
@@ -529,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         JSONObject currently = forecast.getJSONObject("currently");
         Current current = new Current();
+
         current.setHumidity(currently.getDouble("humidity"));
         current.setTime(currently.getLong("time"));
         current.setIcon(currently.getString("icon"));
@@ -586,8 +595,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onResume() {
         super.onResume();
-
         mGoogleApiClient.connect();
+
+
 
 
     }
@@ -831,7 +841,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
+
+
+
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
         if (location == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
@@ -839,19 +853,48 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             handleNewLocation(location);
 
         }
-        float fLat = savedLocation.getFloat(Constants.KEY_LATITUDE, 0);
-        float fLong = savedLocation.getFloat(Constants.KEY_LONGITUDE, 0);
-        if (fLat == 0 && fLong == 0) {
 
 
-            getAddress(currentLatitude, currentLongitude);
-            getForecast(currentLatitude, currentLongitude);
-        } else {
-            pickedLatitude = fLat;
-            pickedLongitude = fLong;
-            getAddress(pickedLatitude, pickedLongitude);
-            getForecast(pickedLatitude, pickedLongitude);
-        }
+
+
+
+
+
+
+            float fLat = savedLocation.getFloat(Constants.KEY_LATITUDE, 0);
+            float fLong = savedLocation.getFloat(Constants.KEY_LONGITUDE, 0);
+            if (fLat == 0 && fLong == 0) {
+
+
+                getAddress(currentLatitude, currentLongitude);
+
+
+                    getForecast(currentLatitude, currentLongitude);
+
+
+
+
+            } else {
+
+
+                pickedLatitude = fLat;
+                pickedLongitude = fLong;
+                getAddress(pickedLatitude, pickedLongitude);
+
+                    getForecast(pickedLatitude, pickedLongitude);
+
+
+            }
+
+
+
+
+
+
+
+
+
+
 
 
     }

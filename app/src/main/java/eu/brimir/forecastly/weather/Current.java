@@ -72,7 +72,7 @@ public class Current {
         return Forecast.getIconId(mIcon);
     }
 
-    private long getTime() {
+public long getTime() {
         return mTime;
     }
 
@@ -98,6 +98,8 @@ public class Current {
     public void setTime(long time) {
         mTime = time;
     }
+
+
 
     public int getTemperature() {
 
